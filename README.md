@@ -71,12 +71,12 @@ is not.
 | Knerr — Repertory to Hering's Guiding Symptoms | 1896 | 131,685 |
 | Kent — Repertory of the Materia Medica | 1897 | 52,447 |
 | Gentry — Concordance Repertory, vol. I | 1893 | 40,493 |
-| Clarke — Clinical Repertory | 1900 | 12,537 |
+| Clarke — Clinical Repertory | 1904 | 12,537 |
 | Repertory to Hering's Condensed Materia Medica | 1889 | 11,156 |
 | Pulford — Rheumatism & Sciatica | 1898 | 7,518 |
 | Bryant — Pocket Manual | 1851 | 4,965 |
 | Sensations as if — Holcomb | 1890 | 2,721 |
-| Vilas — Eye & Ear | 1890 | 2,465 |
+| Vilas — Therapeutics of the Eye and Ear | 1883 | 2,465 |
 | Allen — Intermittent Fever | 1883 | 1,708 |
 | Boenninghausen — Therapeutic Pocket Book | 1891 | 1,323 |
 | Humphreys — Sexual System | 1860 | 1,280 |
