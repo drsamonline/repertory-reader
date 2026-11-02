@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="paper">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Repertory Desk — a reader for the homoeopathic repertories</title>
+<meta name="description" content="A quiet reading room for 271,421 repertory rubrics and 744,394 graded remedy links — seventeen classical repertories and materia medicas, read straight from the open JSON library.">
+<meta name="color-scheme" content="light dark">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#f4efe4">
+<style>
+/* ── palettes ───────────────────────────────────────────────────────────── */
+:root{
+  --ink:#1d1a16; --paper:#f4efe4; --muted:#6d6459; --rule:#d8cfbe; --accent:#7a3b2e;
+  --accent-soft:#b8766018; --card:#fbf7ee; --shadow:0 1px 2px #2a231814, 0 8px 24px #2a23180d;
+  --chip:#efe7d8; --chip-ink:#3a332a; --hl:#f6e2a8;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;
+  --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --measure:68ch; --fs:17px; --lh:1.62; --radius:3px;
+}
+html[data-theme="vellum"]{
+  --ink:#26221b; --paper:#fbf8f0; --muted:#6f6757; --rule:#e2dccb; --accent:#2f5d50;
+  --accent-soft:#2f5d5014; --card:#fffdf8; --chip:#eeeade; --chip-ink:#3b3529; --hl:#dfeccd;
+}
+html[data-theme="sage"]{
+  --ink:#1e2620; --paper:#e9ede3; --muted:#5c6a5e; --rule:#c9d3c4; --accent:#3c5a45;
+  --accent-soft:#3c5a4514; --card:#f2f5ec; --chip:#dde5d7; --chip-ink:#2c3a30; --hl:#f0e6b4;
+}
+html[data-theme="slate"]{
+  --ink:#e8e3d8; --paper:#191b1e; --muted:#9aa0a6; --rule:#2f333a; --accent:#c9a227;
+  --accent-soft:#c9a2271a; --card:#212429; --shadow:0 1px 2px #0006,0 10px 30px #0008;
+  --chip:#2a2e34; --chip-ink:#d7d2c7; --hl:#4a3f18;
+}
+html[data-theme="lampblack"]{
+  --ink:#ded9cf; --paper:#0e0f11; --muted:#8b9096; --rule:#24262b; --accent:#d98356;
+  --accent-soft:#d983561a; --card:#15171a; --shadow:0 1px 2px #0008,0 10px 30px #000a;
+  --chip:#1e2126; --chip-ink:#cfcabf; --hl:#4a2f1c;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--paper); color:var(--ink); font-family:var(--sans);
+  font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  transition:background .35s ease,color .35s ease;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input{font:inherit;color:inherit}
+a{color:var(--accent)}
+::selection{background:var(--hl);color:var(--ink)}
+
+/* ── shell ──────────────────────────────────────────────────────────────── */
+.app{display:grid;grid-template-rows:auto 1fr;grid-template-columns:minmax(0,1fr);height:100dvh;overflow:hidden}
+header.bar{
+  display:flex;align-items:center;gap:14px;padding:0 16px;height:54px;
+  border-bottom:1px solid var(--rule); background:color-mix(in srgb,var(--paper) 88%, var(--card));
+  position:relative;z-index:20;
+}
+.brand{display:flex;align-items:baseline;gap:9px;min-width:0}
+.brand b{font-family:var(--serif);font-weight:600;font-size:16px;letter-spacing:.01em;white-space:nowrap}
+.brand span{color:var(--muted);font-size:11px;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+.bar .grow{flex:1}
+.iconbtn{
+  width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+  color:var(--muted);transition:background .18s,color .18s
+}
+.iconbtn:hover{background:var(--accent-soft);color:var(--ink)}
+.iconbtn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.searchpill{
+  display:flex;align-items:center;gap:8px;border:1px solid var(--rule);border-radius:999px;
+  padding:6px 12px;color:var(--muted);background:var(--card);min-width:190px;max-width:340px;flex:1;
+  transition:border-color .2s,box-shadow .2s
+}
+.searchpill:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.searchpill input{border:0;background:none;outline:none;width:100%;font-size:13.5px}
+.searchpill kbd{font-family:var(--mono);font-size:10px;border:1px solid var(--rule);border-radius:4px;padding:1px 4px;color:var(--muted)}
+
+main{display:grid;grid-template-columns:264px minmax(0,1fr);min-height:0;min-width:0}
+main.no-rail{grid-template-columns:0 minmax(0,1fr)}
+main.no-rail aside.rail{overflow:hidden;padding:0;border:0}
+
+/* ── rail ───────────────────────────────────────────────────────────────── */
+aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;background:color-mix(in srgb,var(--paper) 92%,var(--card))}
+.rail h4{
+  margin:14px 18px 6px;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);font-weight:600
+}
+.rail .item{
+  display:flex;gap:10px;align-items:baseline;width:100%;text-align:left;padding:6px 18px;
+  font-size:13.5px;color:var(--ink);border-left:2px solid transparent;line-height:1.35
+}
+.rail .item:hover{background:var(--accent-soft)}
+.rail .item[aria-current="true"]{border-left-color:var(--accent);background:var(--accent-soft);font-weight:600}
+.rail .item i{font-family:var(--serif);font-style:normal;color:var(--muted);font-size:11.5px;min-width:18px}
+.rail .item em{margin-left:auto;font-style:normal;color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+.rail .tabs{display:flex;gap:4px;margin:0 14px 10px;padding:3px;background:var(--chip);border-radius:8px}
+.rail .tabs button{flex:1;padding:5px;border-radius:6px;font-size:12px;color:var(--muted)}
+.rail .tabs button[aria-selected="true"]{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+
+/* ── reader ─────────────────────────────────────────────────────────────── */
+.reader{overflow:auto;scroll-behavior:smooth;position:relative}
+.chapter-head{
+  padding:52px max(24px,6vw) 22px;border-bottom:1px solid var(--rule);
+  background:linear-gradient(var(--accent-soft),transparent 70%)
+}
+.chapter-head .kicker{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.chapter-head h1{
+  font-family:var(--serif);font-weight:600;font-size:clamp(26px,3.4vw,40px);line-height:1.15;
+  margin:.28em 0 .18em;letter-spacing:-.01em
+}
+.chapter-head p{margin:0;color:var(--muted);font-size:13px;max-width:60ch}
+
+.rows{padding:0 max(16px,4vw) 120px;max-width:calc(var(--measure) + 12vw);margin:0 auto}
+.rub{
+  display:grid;grid-template-columns:1fr auto;gap:4px 20px;align-items:start;
+  padding:14px 0 13px;border-bottom:1px solid color-mix(in srgb,var(--rule) 62%, transparent);
+}
+.rub:hover{background:var(--accent-soft)}
+.rub .txt{font-family:var(--serif);font-size:var(--fs);line-height:var(--lh);letter-spacing:.002em}
+.rub .txt .parent{color:var(--muted);font-style:italic}
+.rub .num{
+  font-family:var(--mono);font-size:10.5px;color:var(--muted);opacity:0;transition:opacity .15s;
+  padding-top:.55em;min-width:34px;text-align:right
+}
+.rub:hover .num{opacity:.65}
+.rems{display:flex;flex-wrap:wrap;gap:4px 5px;justify-content:flex-end;max-width:46ch}
+.chip{
+  display:inline-flex;align-items:center;gap:4px;font-family:var(--sans);font-size:11.5px;
+  padding:2.5px 7px;border-radius:var(--radius);background:var(--chip);color:var(--chip-ink);
+  border:1px solid color-mix(in srgb,var(--rule) 70%, transparent);white-space:nowrap;
+  transition:background .15s,color .15s,border-color .15s
+}
+.chip:hover{background:var(--accent);color:var(--paper);border-color:var(--accent)}
+.chip .g{display:inline-flex;gap:1.5px}
+.chip .g i{width:3.5px;height:3.5px;border-radius:50%;background:currentColor;opacity:.85}
+.chip.unresolved{font-style:italic;opacity:.82}
+
+.empty{padding:64px 24px;text-align:center;color:var(--muted);font-family:var(--serif);font-size:17px}
+.sentinel{height:1px}
+
+/* ── library ────────────────────────────────────────────────────────────── */
+.library{overflow:auto;padding:44px max(20px,5vw) 90px}
+.libhead{max-width:1080px;margin:0 auto 30px}
+.libhead h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,4.4vw,52px);line-height:1.05;margin:0 0 12px;letter-spacing:-.015em}
+.libhead p{color:var(--muted);max-width:62ch;margin:0;font-size:14.5px}
+.stats{display:flex;gap:28px;margin-top:22px;flex-wrap:wrap}
+.stats div{display:flex;flex-direction:column}
+.stats b{font-family:var(--serif);font-size:23px;font-weight:600;font-variant-numeric:tabular-nums}
+.stats span{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:16px;max-width:1080px;margin:0 auto}
+.book{
+  position:relative;text-align:left;padding:20px 20px 18px;background:var(--card);border:1px solid var(--rule);
+  border-radius:4px;box-shadow:var(--shadow);transition:transform .18s,box-shadow .18s,border-color .18s;
+  display:flex;flex-direction:column;gap:10px;min-height:186px;overflow:hidden
+}
+.book::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent);opacity:.85}
+.book:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 45%,var(--rule))}
+.book .yr{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.06em}
+.book h3{font-family:var(--serif);font-size:19px;line-height:1.22;margin:0;font-weight:600}
+.book .au{font-size:12.5px;color:var(--muted);margin-top:-4px}
+.book .meta{margin-top:auto;display:flex;gap:12px;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.book .meta b{color:var(--ink);font-weight:600}
+.tag{position:absolute;right:14px;top:14px;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);padding:2px 6px;border-radius:2px}
+
+/* ── search overlay ─────────────────────────────────────────────────────── */
+.overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--ink) 42%, transparent);backdrop-filter:blur(3px);z-index:60;display:none;padding:8vh 16px}
+.overlay[open]{display:block}
+.palette{
+  max-width:760px;margin:0 auto;background:var(--card);border:1px solid var(--rule);border-radius:8px;
+  box-shadow:0 24px 80px #0006;overflow:hidden;display:flex;flex-direction:column;max-height:76vh
+}
+.palette .field{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--rule)}
+.palette .field input{flex:1;border:0;background:none;outline:none;font-size:16px;font-family:var(--serif)}
+.palette .scope{font-size:11px;color:var(--muted);white-space:nowrap}
+.results{overflow:auto;padding:6px 0}
+.res{display:block;width:100%;text-align:left;padding:10px 16px;border-bottom:1px solid color-mix(in srgb,var(--rule) 45%,transparent)}
+.res:hover,.res[aria-selected="true"]{background:var(--accent-soft)}
+.res .where{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:2px}
+.res .body{font-family:var(--serif);font-size:14.5px;line-height:1.45}
+.res .body mark{background:var(--hl);color:inherit;border-radius:2px;padding:0 1px}
+.res .remsline{font-size:11.5px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.palette .foot{display:flex;gap:14px;padding:9px 16px;border-top:1px solid var(--rule);font-size:11px;color:var(--muted);align-items:center}
+
+/* ── misc ───────────────────────────────────────────────────────────────── */
+.progress{position:absolute;left:0;right:0;top:0;height:2px;background:transparent;z-index:30}
+.progress i{display:block;height:100%;width:0;background:var(--accent);transition:width .12s linear}
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--ink);color:var(--paper);
+  padding:9px 16px;border-radius:999px;font-size:12.5px;opacity:0;pointer-events:none;transition:.28s;z-index:80
+}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.loading{display:flex;align-items:center;justify-content:center;gap:10px;padding:70px;color:var(--muted);font-family:var(--serif)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:p 1.1s infinite ease-in-out}
+.dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}
+@keyframes p{0%,80%,100%{opacity:.25;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:820px){
+  /* the rail becomes an overlay, so main is a single column — a 0-width first
+     column would otherwise swallow the reader */
+  main,main.no-rail{grid-template-columns:minmax(0,1fr)}
+  .brand span{display:none}
+  .searchpill{min-width:0;max-width:none}
+  .brand b{font-size:15px}
+  aside.rail{position:fixed;left:0;top:54px;bottom:0;width:264px;z-index:40;transform:translateX(-100%);transition:transform .25s;box-shadow:0 0 40px #0004}
+  aside.rail.open{transform:none}
+  .rems{justify-content:flex-start;max-width:none}
+  .rub{grid-template-columns:1fr}
+  .rub .num{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="bar">
+    <button class="iconbtn" id="railToggle" title="Contents (c)" aria-label="Contents">
+      <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    </button>
+    <div class="brand"><b>The Repertory Desk</b><span id="crumb">library</span></div>
+    <div class="grow"></div>
+    <label class="searchpill" id="pill">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="searchInput" type="search" placeholder="Search rubrics and remedies" aria-label="Search" autocomplete="off">
+      <kbd>/</kbd>
+    </label>
+    <button class="iconbtn" id="themeBtn" title="Theme (t)" aria-label="Change theme">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg>
+    </button>
+    <button class="iconbtn" id="supportBtn" title="Support" aria-label="Support">
+      <svg viewBox="0 0 24 24"><path d="M12 20s-7-4.6-7-9.3A3.9 3.9 0 0 1 12 8a3.9 3.9 0 0 1 7 2.7C19 15.4 12 20 12 20z"/></svg>
+    </button>
+  </header>
+
+  <main id="main">
+    <aside class="rail" id="rail"></aside>
+    <section class="reader" id="view" tabindex="-1">
+      <div class="loading"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+    </section>
+  </main>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="palette" role="dialog" aria-modal="true" aria-label="Search">
+    <div class="field">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="palInput" placeholder="Find a symptom, a rubric, a remedy…" autocomplete="off">
+      <span class="scope" id="palScope"></span>
+    </div>
+    <div class="results" id="palResults"></div>
+    <div class="foot">
+      <span id="palCount">type to search</span>
+      <span style="margin-left:auto">↑↓ to move · ↵ to open · esc to close</span>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ══════════════════════════════════════════════════════════════════════════
+   The Repertory Desk — a reader, nothing more.
+   Data: drsamonline/homoeopathic-materia-medica-repertory-json (CC0)
+   No network is used except to fetch that library; nothing is ever written back.
+   ═════════════════════════════════════════════════════════════════════════ */
+/* The library is read from its GitHub source. `?lib=<base>/` points the reader
+   at a mirror of the same files (a local copy, or your own fork) — the only
+   supported override, and the one this app was tested against. */
+const OVERRIDE = new URLSearchParams(location.search).get("lib");
+const CDN = OVERRIDE || "https://cdn.jsdelivr.net/gh/drsamonline/homoeopathic-materia-medica-repertory-json@main/";
+const RAW = OVERRIDE || "https://raw.githubusercontent.com/drsamonline/homoeopathic-materia-medica-repertory-json/main/";
+const LS = "rd.";                        // localStorage namespace
+const THEMES = ["paper", "vellum", "sage", "slate", "lampblack"];
+
+/* ── tiny dom helpers ───────────────────────────────────────────────────── */
+const $ = (s, r = document) => r.querySelector(s);
+const el = (t, cls, txt) => { const n = document.createElement(t); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; };
+const debounce = (f, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => f(...a), ms); }; };
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const fmt = n => n >= 1000 ? n.toLocaleString("en-US") : String(n);
+
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.classList.add("on");
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove("on"), 2200);
+}
+
+/* ── offline store: IndexedDB, one record per fetched path ──────────────── */
+const Store = (() => {
+  let dbp = null;
+  const open = () => dbp || (dbp = new Promise((res, rej) => {
+    const rq = indexedDB.open("repertory-desk", 1);
+    rq.onupgradeneeded = () => rq.result.createObjectStore("files", { keyPath: "path" });
+    rq.onsuccess = () => res(rq.result);
+    rq.onerror = () => rej(rq.error);
+  }));
+  return {
+    async get(path) {
+      try {
+        const db = await open();
+        return await new Promise(res => {
+          const rq = db.transaction("files").objectStore("files").get(path);
+          rq.onsuccess = () => res(rq.result || null);
+          rq.onerror = () => res(null);
+        });
+      } catch { return null; }
+    },
+    async put(path, body) {
+      try {
+        const db = await open();
+        db.transaction("files", "readwrite").objectStore("files")
+          .put({ path, body, ts: Date.now() });
+      } catch { /* private mode — memory cache still works */ }
+    },
+    async size() {
+      try {
+        const db = await open();
+        return await new Promise(res => {
+          const rq = db.transaction("files").objectStore("files").getAll();
+          rq.onsuccess = () => res((rq.result || []).reduce((n, r) => n + (r.body?.length || 0), 0));
+          rq.onerror = () => res(0);
+        });
+      } catch { return 0; }
+    }
+  };
+})();
+
+/* ── fetch layer: memory → IndexedDB → CDN → raw ────────────────────────── */
+const mem = new Map();
+const inflight = new Map();
+
+async function load(path, { refresh = false } = {}) {
+  if (!refresh && mem.has(path)) return mem.get(path);
+  if (inflight.has(path)) return inflight.get(path);
+  const job = (async () => {
+    if (!refresh) {
+      const hit = await Store.get(path);
+      if (hit && Date.now() - hit.ts < 7 * 864e5) {
+        try { const d = JSON.parse(hit.body); mem.set(path, d); revalidate(path); return d; }
+        catch { /* corrupt entry — fall through to network */ }
+      }
+    }
+    let text, err;
+    for (const base of [CDN, RAW]) {
+      try {
+        const r = await fetch(base + path, { cache: "force-cache" });
+        if (!r.ok) throw new Error(r.status + " " + r.statusText);
+        text = await r.text(); err = null; break;
+      } catch (e) { err = e; }
+    }
+    if (text == null) throw err || new Error("offline");
+    const data = JSON.parse(text);
+    mem.set(path, data);
+    Store.put(path, text);
+    return data;
+  })();
+  inflight.set(path, job);
+  try { return await job; } finally { inflight.delete(path); }
+}
+const revalidate = debounce(async (path) => {
+  try {
+    const r = await fetch(CDN + path, { cache: "no-cache" });
+    if (!r.ok) return;
+    const text = await r.text();
+    const cur = await Store.get(path);
+    if (!cur || cur.body !== text) { mem.set(path, JSON.parse(text)); Store.put(path, text); }
+  } catch { }
+}, 4000);
+
+/* ── state ──────────────────────────────────────────────────────────────── */
+const S = {
+  catalog: null,
+  book: null,          // catalog entry
+  chapter: null,       // chapter entry (split books) or null
+  rubrics: [],         // current chapter's rubrics (normalised)
+  remedyIndex: {},     // abbrev -> name
+  loaded: new Map(),   // path -> rubrics[]  (whole-book search)
+  sectionsMeta: [],    // the payload's own sections, for single-file books
+  activeSection: null,
+  theme: localStorage.getItem(LS + "theme") || "paper",
+  recent: JSON.parse(localStorage.getItem(LS + "recent") || "[]"),
+};
+
+/* ── normalise a book payload into one flat rubric array ────────────────── */
+function normalise(data) {
+  const out = [];
+  if (data.type === "materia_medica") {
+    for (const rem of data.remedies || [])
+      for (const s of rem.symptoms || [])
+        out.push({ t: s.text, p: null, rems: [], ch: rem.name, chp: s.chapter || "General" });
+    return out;
+  }
+  const sections = data.section ? [data.section] : (data.sections || []);
+  sections.forEach((sec, si) => {
+    for (const r of sec.rubrics || [])
+      out.push({
+        t: r.text || "", p: r.parent || null, ch: sec.title, sec: si,
+        rems: (r.remedies || []).map(x => Array.isArray(x)
+          ? { a: x[0], g: x[1] ?? null }
+          : (typeof x === "number" ? { a: x, g: null } : { a: x.abbrev, g: x.grade ?? null }))
+      });
+  });
+  return out;
+}
+function resolveTable(data, rubrics) {
+  if (data.remedy_table) {
+    const t = data.remedy_table;
+    for (const r of rubrics)
+      for (const x of r.rems) if (typeof x.a === "number") x.a = (t[x.a] || {}).abbrev || "?";
+    return Object.fromEntries(t.map(e => [e.abbrev, e.name || null]));
+  }
+  const idx = data.remedy_index || {};
+  return Object.fromEntries(Object.entries(idx).map(([k, v]) => [k, v.name || null]));
+}
+
+/* ── rendering: library ─────────────────────────────────────────────────── */
+function renderLibrary() {
+  const v = $("#view");
+  v.innerHTML = "";
+  const wrap = el("div", "library");
+  const head = el("div", "libhead");
+  head.innerHTML = `
+    <h1>Seventeen repertories,<br>one reading room.</h1>
+    <p>Every rubric here is a printed line from a classical repertory, transcribed
+       verbatim, with the remedies the book itself sets beside it. Nothing is
+       added, nothing is corrected, nothing is ranked. Read, search, compare.</p>
+    <div class="stats">
+      <div><b>${fmt(S.catalog.totals.repertory_rubrics)}</b><span>rubrics</span></div>
+      <div><b>${fmt(S.catalog.totals.remedy_links)}</b><span>remedy links</span></div>
+      <div><b>${S.catalog.books.length}</b><span>volumes</span></div>
+      <div><b>1847–1906</b><span>in print</span></div>
+    </div>`;
+  wrap.append(head);
+  const grid = el("div", "grid");
+  const books = [...S.catalog.books].sort((a, b) => (a.year || 0) - (b.year || 0));
+  for (const b of books) {
+    const card = el("button", "book");
+    const n = b.counts?.rubrics ?? b.counts?.symptoms ?? 0;
+    const links = b.counts?.remedy_links ?? b.counts?.remedies ?? 0;
+    card.innerHTML = `
+      <span class="tag">${b.type === "materia_medica" ? "materia medica" : "repertory"}</span>
+      <span class="yr">${b.year || ""}${b.parts ? ` · part ${b.part}/${b.parts}` : ""}</span>
+      <h3>${esc(b.title)}</h3>
+      <span class="au">${esc(b.author || "")}</span>
+      <span class="meta"><span><b>${fmt(n)}</b> ${b.type === "materia_medica" ? "symptoms" : "rubrics"}</span>
+      <span><b>${fmt(links)}</b> ${b.type === "materia_medica" ? "remedies" : "links"}</span>
+      ${b.chapters ? `<span><b>${b.chapters.length}</b> ch.</span>` : ""}</span>`;
+    card.onclick = () => openBook(b);
+    grid.append(card);
+  }
+  wrap.append(grid);
+  v.append(wrap);
+  $("#crumb").textContent = "library";
+  document.title = "The Repertory Desk";
+  renderRail(null);
+  history.replaceState({ view: "library" }, "");
+}
+
+/* ── rendering: rail ────────────────────────────────────────────────────── */
+function renderRail(kind = "chapters") {
+  const rail = $("#rail");
+  rail.innerHTML = "";
+  if (!S.book) { $("#main").classList.add("no-rail"); return; }
+  $("#main").classList.remove("no-rail");
+
+  const back = el("button", "item");
+  back.innerHTML = `<i>←</i><span>All volumes</span>`;
+  back.onclick = () => { S.book = null; S.chapter = null; S.rubrics = []; renderLibrary(); };
+  rail.append(back);
+
+  const chapters = S.book.chapters
+    || (S.sectionsMeta.length > 1
+        ? S.sectionsMeta.map((m, i) => ({ title: m.title, sec: i, rubrics: m.count }))
+        : [{ title: "Whole book", file: S.book.path, rubrics: S.book.counts?.rubrics }]);
+  const tabs = el("div", "tabs");
+  for (const [k, label] of [["chapters", "Contents"], ["remedies", "Remedies"]]) {
+    const t = el("button", null, label);
+    t.setAttribute("aria-selected", String(kind === k));
+    t.onclick = () => renderRail(k);
+    tabs.append(t);
+  }
+  rail.append(tabs);
+
+  if (kind === "chapters") {
+    rail.append(el("h4", null, S.book.title.length > 40 ? "Contents" : S.book.title));
+    chapters.forEach((c, i) => {
+      const it = el("button", "item");
+      it.innerHTML = `<i>${romanise(i + 1)}</i><span>${esc(c.title)}</span><em>${c.rubrics ? fmt(c.rubrics) : ""}</em>`;
+      const active = c.sec != null ? S.activeSection === c.sec : S.chapter?.file === c.file;
+      it.setAttribute("aria-current", String(active));
+      it.onclick = () => c.sec != null ? showSection(c.sec, c.title) : openChapter(c);
+      rail.append(it);
+    });
+  } else {
+    rail.append(el("h4", null, "Remedies in this volume"));
+    const counts = new Map();
+    for (const r of S.rubrics) for (const x of r.rems) counts.set(x.a, (counts.get(x.a) || 0) + 1);
+    const list = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 400);
+    if (!list.length) rail.append(el("p", "empty", "Open a chapter first."));
+    for (const [a, n] of list) {
+      const it = el("button", "item");
+      const nm = S.remedyIndex[a];
+      it.innerHTML = `<span>${esc(a)}${nm ? `<br><small style="color:var(--muted)">${esc(nm)}</small>` : ""}</span><em>${fmt(n)}</em>`;
+      it.onclick = () => filterByRemedy(a);
+      rail.append(it);
+    }
+  }
+}
+const ROMAN = [[1000, "m"], [900, "cm"], [500, "d"], [400, "cd"], [100, "c"], [90, "xc"], [50, "l"], [40, "xl"], [10, "x"], [9, "ix"], [5, "v"], [4, "iv"], [1, "i"]];
+function romanise(n) { let s = ""; for (const [v, r] of ROMAN) while (n >= v) { s += r; n -= v; } return s; }
+
+/* ── rendering: chapter ─────────────────────────────────────────────────── */
+const PAGE = 60;
+let viewRows = [], rendered = 0, observer = null;
+
+function renderChapter() {
+  const v = $("#view");
+  v.innerHTML = "";
+  v.scrollTop = 0;
+  const head = el("div", "chapter-head");
+  const secTitle = S.chapter?.title || S.book.title;
+  head.innerHTML = `
+    <div class="kicker">${esc(S.book.author || "")} · ${S.book.year || ""}</div>
+    <h1>${esc(secTitle)}</h1>
+    <p>${fmt(viewRows.length)} ${viewRows.length === 1 ? "rubric" : "rubrics"}${S.filterRemedy ? ` containing <b>${esc(S.filterRemedy)}</b>` : ""}${S.query ? ` matching “${esc(S.query)}”` : ""}.</p>`;
+  v.append(head);
+
+  const rows = el("div", "rows");
+  v.append(rows);
+  rendered = 0;
+  if (!viewRows.length) {
+    rows.append(el("div", "empty", "Nothing matches here."));
+    return;
+  }
+  renderMore(rows);
+  observer?.disconnect();
+  const sentinel = el("div", "sentinel");
+  rows.append(sentinel);
+  observer = new IntersectionObserver(es => {
+    if (es.some(e => e.isIntersecting)) renderMore(rows);
+  }, { root: v, rootMargin: "900px" });
+  observer.observe(sentinel);
+
+  v.onscroll = () => {
+    const p = v.scrollTop / Math.max(1, v.scrollHeight - v.clientHeight);
+    $("#crumb").textContent = `${S.book.title.slice(0, 28)}${S.book.title.length > 28 ? "…" : ""} · ${Math.round(p * 100)}%`;
+  };
+}
+
+function renderMore(rows) {
+  const frag = document.createDocumentFragment();
+  const end = Math.min(rendered + PAGE, viewRows.length);
+  for (let i = rendered; i < end; i++) frag.append(rubricNode(viewRows[i], i));
+  rows.insertBefore(frag, rows.lastElementChild);
+  rendered = end;
+}
+
+function rubricNode(r, i) {
+  const n = el("div", "rub");
+  const txt = el("div", "txt");
+  if (r.p) txt.append(el("span", "parent", r.p + ", "));
+  txt.append(document.createTextNode(r.t));
+  n.append(txt);
+  const rems = el("div", "rems");
+  for (const x of r.rems) {
+    const c = el("button", "chip" + (S.remedyIndex[x.a] ? "" : " unresolved"));
+    c.title = S.remedyIndex[x.a] || "not resolved in the source's abbreviation list";
+    const g = el("span", "g");
+    for (let k = 0; k < (x.g || 0); k++) g.append(el("i"));
+    if (x.g) c.append(g);
+    c.append(document.createTextNode(x.a));
+    c.onclick = () => filterByRemedy(x.a);
+    rems.append(c);
+  }
+  n.append(rems);
+  const num = el("div", "num", String(i + 1));
+  n.append(num);
+  return n;
+}
+
+/* ── opening books and chapters ─────────────────────────────────────────── */
+async function openBook(b, chapter = null) {
+  S.book = b; S.query = ""; S.filterRemedy = null;
+  remember(b.id);
+  renderRail("chapters");
+  const chapters = b.chapters || [{ title: "Whole book", file: b.path, rubrics: b.counts?.rubrics }];
+  await openChapter(chapter || chapters[0], { push: true });
+}
+
+async function openChapter(c, { push = false } = {}) {
+  S.chapter = c; S.query = ""; S.filterRemedy = null;
+  const v = $("#view");
+  v.innerHTML = `<div class="loading"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
+  renderRail("chapters");
+  try {
+    const data = await load(c.file);
+    S.remedyIndex = resolveTable(data, []);
+    const rubrics = normalise(data);
+    resolveTable(data, rubrics);
+    S.rubrics = rubrics;
+    const secs = data.section ? [data.section] : (data.sections || []);
+    S.sectionsMeta = secs.map(x => ({ title: x.title || "General", count: (x.rubrics || []).length }));
+    S.activeSection = secs.length > 1 ? 0 : null;
+    if (secs.length > 1) viewRows = rubrics.filter(r => r.sec === 0);
+    S.loaded.set(c.file, rubrics);
+    viewRows = rubrics;
+    renderRail("chapters");     // the payload's sections are known only now
+    renderChapter();
+    document.title = `${c.title} — ${S.book.title}`;
+    if (push) history.pushState({ book: S.book.id, chapter: c.file }, "");
+  } catch (e) {
+    v.innerHTML = `<div class="empty">This chapter could not be loaded.<br><small>${esc(String(e.message || e))}</small><br><br>
+      <button class="chip" onclick="location.reload()">Try again</button></div>`;
+  }
+}
+
+function showSection(i, title) {
+  S.activeSection = i;
+  S.query = ""; S.filterRemedy = null;
+  viewRows = S.rubrics.filter(r => r.sec === i);
+  S.chapter = { title, file: S.chapter?.file };
+  renderRail("chapters");
+  renderChapter();
+}
+
+function filterByRemedy(a) {
+  S.filterRemedy = a;
+  S.query = "";
+  const name = S.remedyIndex[a];
+  viewRows = S.rubrics.filter(r => r.rems.some(x => x.a === a));
+  renderChapter();
+  toast(`${a}${name ? " — " + name : ""}: ${viewRows.length} rubrics`);
+}
+
+function remember(id) {
+  const r = S.recent.filter(x => x !== id);
+  r.unshift(id);
+  S.recent = r.slice(0, 6);
+  localStorage.setItem(LS + "recent", JSON.stringify(S.recent));
+}
+
+/* ── search ─────────────────────────────────────────────────────────────── */
+const Pal = {
+  open: false, idx: -1, hits: [], scope: "chapter",
+  show(scope) {
+    this.scope = scope || (S.book ? "chapter" : "all");
+    $("#overlay").setAttribute("open", "");
+    this.open = true;
+    $("#palInput").value = "";
+    $("#palScope").textContent = this.scope === "chapter" ? (S.chapter?.title || "this volume") : "all volumes (cached)";
+    $("#palResults").innerHTML = "";
+    $("#palCount").textContent = "type to search";
+    $("#palInput").focus();
+  },
+  close() { $("#overlay").removeAttribute("open"); this.open = false; this.hits = []; this.idx = -1; },
+  setScope(s) { this.scope = s; $("#palScope").textContent = s === "chapter" ? (S.chapter?.title || "this volume") : "all volumes (cached)"; this.run($("#palInput").value); },
+  run: debounce(async function (q) {
+    q = q.trim().toLowerCase();
+    const box = $("#palResults");
+    if (q.length < 2) { box.innerHTML = ""; $("#palCount").textContent = "type at least two letters"; return; }
+    const hits = [];
+    const push = (r, where, book) => {
+      const i = r.t.toLowerCase().indexOf(q);
+      if (i < 0) return;
+      hits.push({ r, where, book, i, q });
+    };
+    if (Pal.scope === "chapter" && S.rubrics.length) {
+      for (const r of S.rubrics) { if (hits.length > 400) break; push(r, S.chapter?.title || "", S.book); }
+    } else {
+      for (const [path, rubs] of S.loaded) {
+        const book = S.catalog.books.find(b => b.path === path || b.chapters?.some(c => c.file === path));
+        const where = S.catalog.books.find(b => b.path === path)?.title
+          || book?.chapters?.find(c => c.file === path)?.title || path;
+        for (const r of rubs) { if (hits.length > 600) break; push(r, where, book); }
+      }
+    }
+    // remedy-abbreviation hits
+    if (q.length >= 2) {
+      for (const r of (Pal.scope === "chapter" ? S.rubrics : [...S.loaded.values()].flat())) {
+        if (hits.length > 700) break;
+        if (r.rems.some(x => x.a.toLowerCase() === q || (S.remedyIndex[x.a] || "").toLowerCase().includes(q)))
+          hits.push({ r, where: r.ch || "", book: S.book, i: 0, q, rem: true });
+      }
+    }
+    Pal.hits = hits.slice(0, 300);
+    Pal.idx = Pal.hits.length ? 0 : -1;
+    Pal.paint();
+  }, 110),
+  paint() {
+    const box = $("#palResults");
+    box.innerHTML = "";
+    if (!Pal.hits.length) {
+      $("#palCount").textContent = "no match";
+      const none = el("div", "empty", "Nothing in this scope.");
+      box.append(none);
+      return;
+    }
+    $("#palCount").textContent = `${Pal.hits.length}${Pal.hits.length >= 300 ? "+" : ""} matches`;
+    Pal.hits.forEach((h, k) => {
+      const b = el("button", "res");
+      b.setAttribute("aria-selected", String(k === Pal.idx));
+      const t = h.r.t;
+      const from = Math.max(0, h.i - 60), to = Math.min(t.length, h.i + h.q.length + 110);
+      const pre = (from > 0 ? "…" : "") + esc(t.slice(from, h.i));
+      const mid = esc(t.slice(h.i, h.i + h.q.length));
+      const post = esc(t.slice(h.i + h.q.length, to)) + (to < t.length ? "…" : "");
+      b.innerHTML = `<div class="where">${esc(h.where || "")}</div>
+        <div class="body">${pre}<mark>${mid}</mark>${post}</div>
+        <div class="remsline">${h.r.rems.slice(0, 12).map(x => esc(x.a)).join(" · ")}</div>`;
+      b.onclick = () => Pal.jump(k);
+      box.append(b);
+    });
+  },
+  move(d) {
+    if (!Pal.hits.length) return;
+    Pal.idx = (Pal.idx + d + Pal.hits.length) % Pal.hits.length;
+    [...$("#palResults").children].forEach((c, i) => c.setAttribute("aria-selected", String(i === Pal.idx)));
+    $("#palResults").children[Pal.idx]?.scrollIntoView({ block: "nearest" });
+  },
+  jump(k) {
+    const h = Pal.hits[k ?? Pal.idx];
+    if (!h) return;
+    Pal.close();
+    if (h.book && h.book.id !== S.book?.id) {
+      openBook(h.book).then(() => focusHit(h));
+    } else focusHit(h);
+  }
+};
+
+function focusHit(h) {
+  // if the hit lives in another chapter of this book, go there first
+  const target = h.r;
+  if (!S.rubrics.includes(target)) {
+    const ch = S.book?.chapters?.find(c => c.title === h.where);
+    if (ch) return openChapter(ch).then(() => focusHit(h));
+  }
+  S.query = h.q; S.filterRemedy = null;
+  viewRows = S.rubrics.filter(r => r.t.toLowerCase().includes(h.q));
+  renderChapter();
+  requestAnimationFrame(() => {
+    const first = $(".rub");
+    first?.scrollIntoView({ block: "center" });
+  });
+}
+
+/* ── theme ──────────────────────────────────────────────────────────────── */
+function applyTheme(t) {
+  S.theme = t;
+  document.documentElement.setAttribute("data-theme", t);
+  localStorage.setItem(LS + "theme", t);
+  const dark = t === "slate" || t === "lampblack";
+  $('meta[name="theme-color"]').setAttribute("content", dark ? "#191b1e" : "#f4efe4");
+}
+function cycleTheme() {
+  const i = THEMES.indexOf(S.theme);
+  applyTheme(THEMES[(i + 1) % THEMES.length]);
+  toast("Theme: " + S.theme);
+}
+
+/* ── boot ───────────────────────────────────────────────────────────────── */
+async function boot() {
+  applyTheme(S.theme);
+  try {
+    S.catalog = await load("catalog.json");
+  } catch (e) {
+    $("#view").innerHTML = `<div class="empty">The library could not be reached.<br>
+      <small>${esc(String(e.message || e))}</small><br><br>
+      <button class="chip" onclick="location.reload()">Retry</button></div>`;
+    return;
+  }
+  renderLibrary();
+  const hash = location.hash.replace(/^#\/?/, "");
+  if (hash) {
+    const [bid, cfile] = hash.split("/");
+    const b = S.catalog.books.find(x => x.id === bid);
+    if (b) {
+      const ch = b.chapters?.find(c => c.file === cfile || c.title === decodeURIComponent(cfile));
+      openBook(b, ch || null);
+    }
+  }
+  if ("serviceWorker" in navigator && location.protocol.startsWith("http"))
+    navigator.serviceWorker.register("sw.js").then(r => r.update()).catch(() => { });
+}
+
+/* ── events ─────────────────────────────────────────────────────────────── */
+$("#themeBtn").onclick = cycleTheme;
+$("#railToggle").onclick = () => $("#rail").classList.toggle("open");
+$("#searchInput").onfocus = () => { $("#searchInput").blur(); Pal.show(S.book ? "chapter" : "all"); };
+$("#searchInput").onclick = e => { e.preventDefault(); Pal.show(S.book ? "chapter" : "all"); };
+$("#palInput").oninput = e => Pal.run(e.target.value);
+$("#palInput").onkeydown = e => {
+  if (e.key === "ArrowDown") { e.preventDefault(); Pal.move(1); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); Pal.move(-1); }
+  else if (e.key === "Enter") { e.preventDefault(); Pal.jump(); }
+  else if (e.key === "Escape") Pal.close();
+};
+$("#overlay").onclick = e => { if (e.target.id === "overlay") Pal.close(); };
+$("#supportBtn").onclick = () => toast("Support: see the landing page footer");
+
+document.addEventListener("keydown", e => {
+  const typing = /input|textarea/i.test(e.target.tagName);
+  if (e.key === "/" && !typing) { e.preventDefault(); Pal.show(S.book ? "chapter" : "all"); }
+  else if (e.key === "Escape" && Pal.open) Pal.close();
+  else if (e.key.toLowerCase() === "t" && !typing) cycleTheme();
+  else if (e.key.toLowerCase() === "c" && !typing) $("#rail").classList.toggle("open");
+  else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); Pal.show(S.book ? "chapter" : "all"); }
+});
+
+window.addEventListener("popstate", ev => {
+  const st = ev.state;
+  if (!st || st.view === "library") { S.book = null; S.chapter = null; renderLibrary(); return; }
+  const b = S.catalog?.books.find(x => x.id === st.book);
+  if (b) { const ch = b.chapters?.find(c => c.file === st.chapter); S.book = b; if (ch) openChapter(ch); }
+});
+
+boot();
+</script>
+</body>
+</html>
