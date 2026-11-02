@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.8.0 — 2026-11-02
+
+- The damage banner now prints the measured figures behind its flag — duplicate
+  rubric rate and the share with no remedy list — so a warning is checkable
+  rather than asserted.
+- Every volume in `catalog.json` carries an `integrity` block: rubrics, exact
+  duplicates (same parent and text) with a percentage, and rubrics with no remedy
+  list with a percentage.
+
 ## 1.7.0 — 2026-11-02
 
 Audit pass over both repositories.

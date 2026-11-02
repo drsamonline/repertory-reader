@@ -258,6 +258,7 @@ aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;
 .banner{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;margin:0 max(16px,4vw);padding:12px 14px;
   border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:6px;
   background:color-mix(in srgb,var(--accent) 8%,transparent);font-size:12.5px;line-height:1.45;color:var(--ink)}
+.banner .figs{display:block;margin-top:4px;font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.02em}
 .banner b{color:var(--accent);letter-spacing:.06em;text-transform:uppercase;font-size:10.5px}
 .resume{
   display:flex;align-items:center;gap:18px;max-width:1080px;margin:0 auto 42px;padding:16px 20px;
@@ -968,7 +969,9 @@ function renderChapter() {
         + "Author: " + (S.book.author || "") + "\n\n"
         + "Where the scan is from (link or attachment):\n\n"
         + "Thank you — it goes straight into the library.\n");
-    ban.innerHTML = `<span><b>${S.book.quality === "damaged" ? "damaged scan" : "partial scan"}</b> — ${esc(S.book.quality_note || "this extraction is not reliable.")}</span>
+    const it = S.book.integrity;
+    const figs = it ? ` <span class="figs">${it.duplicate_pct}% duplicate rubrics · ${it.no_remedy_pct}% without remedies</span>` : "";
+    ban.innerHTML = `<span><b>${S.book.quality === "damaged" ? "damaged scan" : "partial scan"}</b> — ${esc(S.book.quality_note || "this extraction is not reliable.")}${figs}</span>
       <a class="mailto" href="${m}" style="margin-left:auto;flex:0 0 auto">Send a better scan</a>`;
     v.append(ban);
   }
