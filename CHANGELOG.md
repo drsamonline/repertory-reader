@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.4.1 — 2026-11-02
+
+- **No text overlaps anywhere.** A geometry probe now walks every leaf text node at
+  1440, 1024 and 430 px and reports any pair of boxes that intersect: it found 24
+  collisions on the shelf and none after the fix, in the library or in the reader.
+  - The cover's monogram stamp sat on top of the author line; the year and the
+    stamp now share a head row, so the author gets the full width.
+  - The "damaged scan" band covered the year; it now sits on its own line beneath
+    the head.
+  - Rail labels, the book bar's title and chapter, the resume strip, the damage
+    banner and long remedy chips all shrink and ellipsise instead of running under
+    their neighbours.
+
 ## 1.3.1 — 2026-11-02
 
 Interaction and performance pass, driven by clicking every control in a headless

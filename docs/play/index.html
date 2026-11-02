@@ -96,13 +96,14 @@ aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;
   color:var(--muted);font-weight:600
 }
 .rail .item{
-  display:flex;gap:10px;align-items:baseline;width:100%;text-align:left;padding:6px 18px;
+  display:flex;gap:10px;align-items:baseline;width:100%;min-width:0;text-align:left;padding:6px 18px;
   font-size:13.5px;color:var(--ink);border-left:2px solid transparent;line-height:1.35
 }
 .rail .item:hover{background:var(--accent-soft)}
 .rail .item[aria-current="true"]{border-left-color:var(--accent);background:var(--accent-soft);font-weight:600}
 .rail .item i{font-family:var(--serif);font-style:normal;color:var(--muted);font-size:11.5px;min-width:18px}
-.rail .item em{margin-left:auto;font-style:normal;color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+.rail .item span{min-width:0;overflow-wrap:anywhere}
+.rail .item em{margin-left:auto;flex:0 0 auto;font-style:normal;color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
 .rail .tabs{display:flex;gap:4px;margin:0 14px 10px;padding:3px;background:var(--chip);border-radius:8px}
 .rail .tabs button{flex:1;padding:5px;border-radius:6px;font-size:12px;color:var(--muted)}
 .rail .tabs button[aria-selected="true"]{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
@@ -143,6 +144,7 @@ aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;
 .rub:hover .num{opacity:.65}
 .rems{display:flex;flex-wrap:wrap;gap:4px 5px;justify-content:flex-end;max-width:46ch}
 .chip{
+  max-width:26ch;overflow:hidden;text-overflow:ellipsis;
   display:inline-flex;align-items:center;gap:4px;font-family:var(--sans);font-size:11.5px;
   padding:2.5px 7px;border-radius:var(--radius);background:var(--chip);color:var(--chip-ink);
   border:1px solid color-mix(in srgb,var(--rule) 70%, transparent);white-space:nowrap;
@@ -197,25 +199,28 @@ aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;
   position:relative;aspect-ratio:3/4.05;border-radius:4px 8px 8px 4px;overflow:hidden;
   background:linear-gradient(150deg,var(--c1),var(--c2));
   box-shadow:0 14px 26px -14px #0009, inset 0 0 0 1px #0002;
-  display:flex;flex-direction:column;padding:16px 15px 15px 19px;color:var(--c-ink)
+  display:flex;flex-direction:column;gap:0;padding:14px 14px 14px 19px;color:var(--c-ink)
 }
+.cover .head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.cover .head .n{position:static;flex:0 0 auto}
 .cover .art::before{content:"";position:absolute;left:0;top:0;bottom:0;width:7px;
   background:linear-gradient(90deg,#0004,#0000 60%,#fff2);opacity:.5}
 .cover .art::after{content:"";position:absolute;inset:0;
   background:radial-gradient(90% 60% at 85% -10%, #ffffff33, transparent 60%);pointer-events:none}
-.cover .mono-year{font-family:var(--mono);font-size:10px;letter-spacing:.16em;opacity:.8}
+.cover .mono-year{font-family:var(--mono);font-size:10px;letter-spacing:.16em;opacity:.8;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .cover .t{font-family:var(--serif);font-weight:600;font-size:15.5px;line-height:1.2;margin-top:auto;
   display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;letter-spacing:-.01em}
 .cover .rule{height:1px;background:currentColor;opacity:.28;margin:9px 0 7px}
 .cover .a{font-size:10.5px;line-height:1.3;opacity:.85;display:-webkit-box;-webkit-line-clamp:2;
-  -webkit-box-orient:vertical;overflow:hidden}
-.cover .n{position:absolute;right:11px;bottom:11px;font-family:var(--serif);font-size:11px;letter-spacing:.1em;opacity:.55;
-  border:1px solid currentColor;border-radius:2px;padding:1px 4px}
+  -webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;padding-right:2px}
+.cover .n{font-family:var(--serif);font-size:10.5px;letter-spacing:.1em;opacity:.55;
+  border:1px solid currentColor;border-radius:2px;padding:1px 4px;line-height:1.3}
 .cover .cap{margin-top:9px;font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
 .cover .cap b{color:var(--ink);font-weight:600}
-.cover .warn{position:absolute;left:8px;top:8px;right:8px;font-size:9.5px;letter-spacing:.1em;
+.cover .warn{align-self:flex-start;margin:7px 0 0;font-size:9px;letter-spacing:.09em;
   text-transform:uppercase;background:#00000055;color:#ffd9c9;border:1px solid #ffffff33;
-  border-radius:3px;padding:2px 5px;text-align:center;backdrop-filter:blur(2px)}
+  border-radius:3px;padding:2px 5px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .cover.is-damaged .art{filter:saturate(.55)}
 .contribute{
   display:flex;align-items:center;gap:14px;flex-wrap:wrap;max-width:1080px;margin:34px auto 0;
@@ -231,7 +236,7 @@ aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;
 }
 .contribute .mailto:hover{background:var(--accent);color:var(--paper)}
 .contribute .addr{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
-.banner{display:flex;gap:10px;align-items:flex-start;margin:0 max(16px,4vw);padding:12px 14px;
+.banner{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;margin:0 max(16px,4vw);padding:12px 14px;
   border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:6px;
   background:color-mix(in srgb,var(--accent) 8%,transparent);font-size:12.5px;line-height:1.45;color:var(--ink)}
 .banner b{color:var(--accent);letter-spacing:.06em;text-transform:uppercase;font-size:10.5px}
@@ -241,9 +246,10 @@ aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;
 }
 .resume .mini{width:46px;height:64px;border-radius:2px 5px 5px 2px;flex:0 0 46px;
   background:linear-gradient(150deg,var(--c1),var(--c2));box-shadow:0 8px 14px -8px #0008}
-.resume h3{font-family:var(--serif);font-size:16px;margin:0;font-weight:600}
+.resume>span:nth-child(2){min-width:0;flex:1 1 auto}
+.resume h3{font-family:var(--serif);font-size:16px;margin:0;font-weight:600;overflow-wrap:anywhere}
 .resume p{margin:2px 0 0;font-size:12px;color:var(--muted)}
-.resume .go{margin-left:auto;font-size:12.5px;border:1px solid var(--rule);border-radius:999px;padding:8px 16px}
+.resume .go{margin-left:auto;flex:0 0 auto;font-size:12.5px;border:1px solid var(--rule);border-radius:999px;padding:8px 16px}
 .resume:hover .go{border-color:var(--accent);color:var(--accent)}
 .book{
   position:relative;text-align:left;padding:20px 20px 18px;background:var(--card);border:1px solid var(--rule);
@@ -285,8 +291,11 @@ aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;
   backdrop-filter:blur(6px)}
 .bookbar .mini{width:22px;height:30px;border-radius:1px 3px 3px 1px;flex:0 0 22px;
   background:linear-gradient(150deg,var(--c1),var(--c2));box-shadow:0 4px 8px -5px #0007}
-.bookbar .ttl{font-family:var(--serif);font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:38ch}
-.bookbar .sub{font-size:11px;color:var(--muted);white-space:nowrap}
+.bookbar .ttl{font-family:var(--serif);font-size:13.5px;font-weight:600;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto;max-width:38ch}
+.bookbar .sub{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;min-width:0;flex:1 1 auto}
+.bookbar button{flex:0 0 auto}
 .bookbar .spacer{flex:1}
 .bookbar button{border:1px solid var(--rule);border-radius:999px;padding:4px 11px;font-size:11.5px;color:var(--muted)}
 .bookbar button:hover{color:var(--accent);border-color:var(--accent)}
@@ -707,12 +716,15 @@ function coverNode(b) {
   if (b.quality) el2.classList.add("is-damaged");
   el2.title = b.quality_note || "";
   el2.innerHTML = `
-    <span class="art">${flag}
-      <span class="mono-year">${b.year || ""}${b.parts ? ` · ${b.part}/${b.parts}` : ""}</span>
+    <span class="art">
+      <span class="head">
+        <span class="mono-year">${b.year || ""}${b.parts ? ` · ${b.part}/${b.parts}` : ""}</span>
+        <span class="n">${initials}</span>
+      </span>
+      ${flag}
       <span class="t">${esc(b.title)}</span>
       <span class="rule"></span>
       <span class="a">${esc(b.author || "")}</span>
-      <span class="n">${initials}</span>
     </span>
     <span class="cap"><span><b>${fmt(n)}</b> ${b.type === "materia_medica" ? "symptoms" : "rubrics"}</span>
       <span>${b.type === "materia_medica" ? "materia medica" : "repertory"}</span></span>`;
