@@ -468,6 +468,10 @@ const THEMES = ["paper", "vellum", "sage", "slate", "lampblack"];
 const $ = (s, r = document) => r.querySelector(s);
 const el = (t, cls, txt) => { const n = document.createElement(t); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; };
 const debounce = (f, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => f(...a), ms); }; };
+/* Remedies are printed with whatever spacing and punctuation the compositor had:
+   'Nux-v.', 'Nux v.', 'NuxVom', '(Calc-c)', 'ph-ac,' are one remedy each. The key
+   is the letters alone, so variants collapse to a single remedy. */
+const rkey = s => String(s || "").toLowerCase().replace(/[^a-z]/g, "");
 const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const fmt = n => n >= 1000 ? n.toLocaleString("en-US") : String(n);
 
@@ -618,9 +622,12 @@ function normalise(data) {
     for (const r of sec.rubrics || [])
       out.push({
         t: r.text || "", p: r.parent || null, ch: sec.title, sec: si,
-        rems: (r.remedies || []).map(x => Array.isArray(x)
-          ? { a: x[0], g: x[1] ?? null }
-          : (typeof x === "number" ? { a: x, g: null } : { a: x.abbrev, g: x.grade ?? null }))
+        rems: (r.remedies || []).map(x => {
+          const e = Array.isArray(x) ? { a: x[0], g: x[1] ?? null }
+            : (typeof x === "number" ? { a: x, g: null } : { a: x.abbrev, g: x.grade ?? null });
+          e.k = rkey(e.a);
+          return e;
+        })
       });
   });
   return out;
@@ -857,15 +864,14 @@ function renderRail(kind = "chapters") {
     });
   } else {
     rail.append(el("h4", null, "Remedies in this volume"));
-    const counts = new Map();
-    for (const r of S.rubrics) for (const x of r.rems) counts.set(x.a, (counts.get(x.a) || 0) + 1);
-    const list = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 400);
+    const groups = S.groups || remedyGroups(S.rubrics);
+    const list = [...groups.values()].sort((a, b) => b.n - a.n).slice(0, 400);
     if (!list.length) rail.append(el("p", "empty", "Open a chapter first."));
-    for (const [a, n] of list) {
+    for (const g of list) {
       const it = el("button", "item");
-      const nm = S.remedyIndex[a];
-      it.innerHTML = `<span>${esc(a)}${nm ? `<br><small style="color:var(--muted)">${esc(nm)}</small>` : ""}</span><em>${fmt(n)}</em>`;
-      it.onclick = () => filterByRemedy(a);
+      it.innerHTML = `<span>${esc(g.display)}${g.name ? `<br><small style="color:var(--muted)">${esc(g.name)}</small>` : ""}
+        ${g.variants > 1 ? `<br><small style="color:var(--accent)">${g.variants} spellings</small>` : ""}</span><em>${fmt(g.n)}</em>`;
+      it.onclick = () => filterByRemedy(g.key, g.display);
       rail.append(it);
     }
   }
@@ -1030,12 +1036,14 @@ function rubricNode(r, i) {
   const rems = el("div", "rems");
   for (const x of r.rems) {
     const c = el("button", "chip" + (x.g ? " g" + x.g : "") + (S.remedyIndex[x.a] ? "" : " unresolved"));
-    c.title = S.remedyIndex[x.a] || "not resolved in the source's abbreviation list";
+    const grp = S.groups?.get(x.k);
+    c.title = (S.remedyIndex[x.a] || "not resolved in the source's abbreviation list")
+      + (grp && grp.variants > 1 ? ` · ${grp.variants} printed spellings` : "");
     const g = el("span", "g");
     for (let k = 0; k < (x.g || 0); k++) g.append(el("i"));
     if (x.g) c.append(g);
     c.append(document.createTextNode(x.a));
-    c.onclick = () => filterByRemedy(x.a);
+    c.onclick = () => filterByRemedy(x.k, x.a);
     rems.append(c);
   }
   if (r.mods && r.mods.length) {
@@ -1078,6 +1086,7 @@ async function openChapter(c, { push = false } = {}) {
       S.remedy = 0;
       viewRows = mmRows(0);
     } else if (secs.length > 1) viewRows = rubrics.filter(r => r.sec === 0);
+    S.groups = remedyGroups(rubrics);
     S.loaded.set(c.file, rubrics);
     if (S.loaded.size > 8) {                       // drop the oldest, keep the pool small
       const oldest = S.loaded.keys().next().value;
@@ -1093,6 +1102,26 @@ async function openChapter(c, { push = false } = {}) {
     v.innerHTML = `<div class="empty">This chapter could not be loaded.<br><small>${esc(String(e.message || e))}</small><br><br>
       <button class="chip" onclick="location.reload()">Try again</button></div>`;
   }
+}
+
+/* one entry per remedy, with the printed spellings that collapsed into it */
+function remedyGroups(rubrics) {
+  const g = new Map();
+  for (const r of rubrics) {
+    for (const x of r.rems) {
+      if (!x.k) x.k = rkey(x.a);
+      let e = g.get(x.k);
+      if (!e) g.set(x.k, e = { key: x.k, forms: new Map(), n: 0, name: null });
+      e.n++;
+      e.forms.set(x.a, (e.forms.get(x.a) || 0) + 1);
+      if (!e.name && S.remedyIndex[x.a]) e.name = S.remedyIndex[x.a];
+    }
+  }
+  for (const e of g.values()) {
+    e.display = [...e.forms.entries()].sort((a, b) => b[1] - a[1])[0][0];
+    e.variants = e.forms.size;
+  }
+  return g;
 }
 
 function mmRows(ri) {
@@ -1126,13 +1155,15 @@ function showSection(i, title) {
   renderChapter();
 }
 
-function filterByRemedy(a) {
-  S.filterRemedy = a;
+function filterByRemedy(k, printed) {
+  const grp = S.groups?.get(k);
+  S.filterRemedy = grp?.display || printed || k;
   S.query = "";
-  const name = S.remedyIndex[a];
-  viewRows = S.rubrics.filter(r => r.rems.some(x => x.a === a));
+  const name = grp?.name || S.remedyIndex[printed] || null;
+  viewRows = S.rubrics.filter(r => r.rems.some(x => x.k === k));
   renderChapter();
-  toast(`${a}${name ? " — " + name : ""}: ${viewRows.length} rubrics`);
+  const extra = grp && grp.variants > 1 ? ` (${grp.variants} spellings: ${[...grp.forms.keys()].join(", ")})` : "";
+  toast(`${S.filterRemedy}${name ? " — " + name : ""}: ${viewRows.length} rubrics${extra}`);
 }
 
 function remember(id) {
@@ -1177,7 +1208,7 @@ const Pal = {
       // remedies: a lookup, not a scan
       for (const [abbrev, ids] of ix.byRemedy) {
         if (hits.length >= LIMIT) break;
-        if (abbrev.startsWith(q) || (S.remedyIndex[abbrev] || "").toLowerCase().includes(q))
+        if (abbrev.startsWith(q) || rkey(abbrev).startsWith(rkey(q)) || (S.remedyIndex[abbrev] || "").toLowerCase().includes(q))
           for (const i of ids) { if (hits.length >= LIMIT) break; add(rubs[i], where, book, -1); }
       }
       return n;

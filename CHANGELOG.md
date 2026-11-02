@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.6.0 — 2026-11-02
+
+**One remedy is one remedy.** The books print the same drug with whatever spacing,
+punctuation and case the compositor had — `Nux-v.`, `Nux v.`, `NuxVom`, `(Calc-c)`,
+`Calc-c.)`, `ph-ac,`, `PH-ac` — and the reader was treating each spelling as a
+separate medicine. Across the library that is **27,062 printed tokens collapsing to
+20,786 remedies: 6,276 duplicate spellings**.
+
+- Every remedy now carries a **letters-only key** (`Nux-v.` and `Nux v.` both → `nuxv`).
+- A chip filters by the key, so tapping `Nux-v.` finds the rubrics printed `Nux v.`
+  and `NuxVom` as well.
+- The remedy rail lists **one row per remedy**, showing the most common printed form,
+  the resolved name, and how many spellings collapsed into it — Gentry's rail now
+  shows 286 remedies instead of 1,354 tokens, 98 of them marked with their variants.
+- Search matches remedy keys as well as printed forms.
+- Each volume in `catalog.json` now records `remedy_spellings` — tokens, keys and how
+  many merged — and the library totals carry the same three figures.
+
 ## 1.5.0 — 2026-11-02
 
 - **A Wanted shelf.** Volumes that are not in the library, or that were extracted and
