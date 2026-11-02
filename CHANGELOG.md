@@ -1,5 +1,25 @@
 # Changelog
 
+## 1.2.0 — 2026-11-02
+
+A design pass. The reader was correct and plain; a repertory is a printed book,
+and the shelf should look like one.
+
+- **The library is a shelf.** Every volume is drawn as a bound book — eight
+  book-cloth colours assigned by a hash of its id, so a volume keeps its cloth on
+  every visit and every device — with the year on the spine head, the title set
+  in the display serif, the author beneath a hairline rule, a monogram stamp and
+  the counts on the shelf edge. No images: the covers are CSS, so they cost
+  nothing to load.
+- **A resume strip** appears above the shelf once you have opened something.
+- **A book bar in the reader**: mini cover, volume title, the chapter you are in
+  ("chapter 4 of 30"), previous/next chapter, and a live percentage.
+- **A drop cap** opens each chapter — the first letter of the first rubric, in
+  the accent, the way a printed page starts.
+- **Remedy chips carry their grade**: a printed grade 1 is quiet, 2 is tinted,
+  3 is weighted and bordered, so the eye finds the strong remedies first.
+- Warm radial paper behind the reader; five themes re-tuned to match.
+
 ## 1.1.0 — 2026-11-02
 
 **The materia medicas are readable now.** They were being flattened like a

@@ -16,6 +16,7 @@
   --accent-soft:#b8766018; --card:#fbf7ee; --shadow:0 1px 2px #2a231814, 0 8px 24px #2a23180d;
   --chip:#efe7d8; --chip-ink:#3a332a; --hl:#f6e2a8;
   --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;
+  --glow:radial-gradient(120% 90% at 12% 0%, #ffffff 0%, #fbf7ee 42%, #f0e8d6 100%);
   --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   --measure:68ch; --fs:17px; --lh:1.62; --radius:3px;
@@ -28,6 +29,10 @@ html[data-theme="sage"]{
   --ink:#1e2620; --paper:#e9ede3; --muted:#5c6a5e; --rule:#c9d3c4; --accent:#3c5a45;
   --accent-soft:#3c5a4514; --card:#f2f5ec; --chip:#dde5d7; --chip-ink:#2c3a30; --hl:#f0e6b4;
 }
+html[data-theme="vellum"]{--glow:radial-gradient(120% 90% at 12% 0%, #ffffff 0%, #fdfbf5 45%, #f2ecdd 100%);}
+html[data-theme="sage"]{--glow:radial-gradient(120% 90% at 12% 0%, #f7faf1 0%, #eef2e7 45%, #e0e7d8 100%);}
+html[data-theme="slate"]{--glow:radial-gradient(120% 90% at 12% 0%, #24282e 0%, #1b1e22 45%, #121417 100%);}
+html[data-theme="lampblack"]{--glow:radial-gradient(120% 90% at 12% 0%, #1a1c20 0%, #111214 45%, #0a0b0c 100%);}
 html[data-theme="slate"]{
   --ink:#e8e3d8; --paper:#191b1e; --muted:#9aa0a6; --rule:#2f333a; --accent:#c9a227;
   --accent-soft:#c9a2271a; --card:#212429; --shadow:0 1px 2px #0006,0 10px 30px #0008;
@@ -118,6 +123,13 @@ aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;
 }
 .rub:hover{background:var(--accent-soft)}
 .rub .txt{font-family:var(--serif);font-size:var(--fs);line-height:var(--lh);letter-spacing:.002em}
+.rub.first .txt::first-letter{
+  float:left;font-size:3.1em;line-height:.86;padding:.06em .12em 0 0;font-weight:600;color:var(--accent)
+}
+.chip.g1{background:transparent;border-color:color-mix(in srgb,var(--rule) 90%,transparent);color:var(--muted)}
+.chip.g2{background:color-mix(in srgb,var(--chip) 70%,var(--accent) 10%)}
+.chip.g3{background:color-mix(in srgb,var(--accent) 18%,var(--chip));font-weight:600;
+  border-color:color-mix(in srgb,var(--accent) 40%,transparent)}
 .rub .txt .parent{color:var(--muted);font-style:italic}
 .rub .num{
   font-family:var(--mono);font-size:10.5px;color:var(--muted);opacity:0;transition:opacity .15s;
@@ -164,7 +176,48 @@ aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;
 .stats div{display:flex;flex-direction:column}
 .stats b{font-family:var(--serif);font-size:23px;font-weight:600;font-variant-numeric:tabular-nums}
 .stats span{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:16px;max-width:1080px;margin:0 auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:26px 22px;max-width:1080px;margin:0 auto}
+.shelf{max-width:1080px;margin:0 auto}
+.shelfrow{position:relative;padding-bottom:16px;margin-bottom:34px}
+.shelfrow::after{content:"";position:absolute;left:-6px;right:-6px;bottom:0;height:10px;border-radius:2px;
+  background:linear-gradient(var(--rule),color-mix(in srgb,var(--rule) 40%,transparent));
+  box-shadow:0 10px 18px -12px #0006}
+.cover{
+  position:relative;text-align:left;padding:0;border:0;background:none;cursor:pointer;
+  transition:transform .22s cubic-bezier(.2,.7,.3,1);transform-origin:bottom center
+}
+.cover:hover{transform:translateY(-6px) rotate(-.6deg)}
+.cover:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.cover .art{
+  position:relative;aspect-ratio:3/4.05;border-radius:4px 8px 8px 4px;overflow:hidden;
+  background:linear-gradient(150deg,var(--c1),var(--c2));
+  box-shadow:0 14px 26px -14px #0009, inset 0 0 0 1px #0002;
+  display:flex;flex-direction:column;padding:16px 15px 15px 19px;color:var(--c-ink)
+}
+.cover .art::before{content:"";position:absolute;left:0;top:0;bottom:0;width:7px;
+  background:linear-gradient(90deg,#0004,#0000 60%,#fff2);opacity:.5}
+.cover .art::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(90% 60% at 85% -10%, #ffffff33, transparent 60%);pointer-events:none}
+.cover .mono-year{font-family:var(--mono);font-size:10px;letter-spacing:.16em;opacity:.8}
+.cover .t{font-family:var(--serif);font-weight:600;font-size:15.5px;line-height:1.2;margin-top:auto;
+  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;letter-spacing:-.01em}
+.cover .rule{height:1px;background:currentColor;opacity:.28;margin:9px 0 7px}
+.cover .a{font-size:10.5px;line-height:1.3;opacity:.85;display:-webkit-box;-webkit-line-clamp:2;
+  -webkit-box-orient:vertical;overflow:hidden}
+.cover .n{position:absolute;right:11px;bottom:11px;font-family:var(--serif);font-size:11px;letter-spacing:.1em;opacity:.55;
+  border:1px solid currentColor;border-radius:2px;padding:1px 4px}
+.cover .cap{margin-top:9px;font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.cover .cap b{color:var(--ink);font-weight:600}
+.resume{
+  display:flex;align-items:center;gap:18px;max-width:1080px;margin:0 auto 42px;padding:16px 20px;
+  border:1px solid var(--rule);border-radius:10px;background:var(--glow);box-shadow:var(--shadow);text-align:left;width:100%
+}
+.resume .mini{width:46px;height:64px;border-radius:2px 5px 5px 2px;flex:0 0 46px;
+  background:linear-gradient(150deg,var(--c1),var(--c2));box-shadow:0 8px 14px -8px #0008}
+.resume h3{font-family:var(--serif);font-size:16px;margin:0;font-weight:600}
+.resume p{margin:2px 0 0;font-size:12px;color:var(--muted)}
+.resume .go{margin-left:auto;font-size:12.5px;border:1px solid var(--rule);border-radius:999px;padding:8px 16px}
+.resume:hover .go{border-color:var(--accent);color:var(--accent)}
 .book{
   position:relative;text-align:left;padding:20px 20px 18px;background:var(--card);border:1px solid var(--rule);
   border-radius:4px;box-shadow:var(--shadow);transition:transform .18s,box-shadow .18s,border-color .18s;
@@ -200,6 +253,17 @@ aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;
 .palette .foot{display:flex;gap:14px;padding:9px 16px;border-top:1px solid var(--rule);font-size:11px;color:var(--muted);align-items:center}
 
 /* ── misc ───────────────────────────────────────────────────────────────── */
+.bookbar{position:sticky;top:0;z-index:25;display:flex;align-items:center;gap:12px;
+  padding:9px 22px;border-bottom:1px solid var(--rule);background:color-mix(in srgb,var(--paper) 92%,var(--card));
+  backdrop-filter:blur(6px)}
+.bookbar .mini{width:22px;height:30px;border-radius:1px 3px 3px 1px;flex:0 0 22px;
+  background:linear-gradient(150deg,var(--c1),var(--c2));box-shadow:0 4px 8px -5px #0007}
+.bookbar .ttl{font-family:var(--serif);font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:38ch}
+.bookbar .sub{font-size:11px;color:var(--muted);white-space:nowrap}
+.bookbar .spacer{flex:1}
+.bookbar button{border:1px solid var(--rule);border-radius:999px;padding:4px 11px;font-size:11.5px;color:var(--muted)}
+.bookbar button:hover{color:var(--accent);border-color:var(--accent)}
+.bookbar .pct{font-family:var(--mono);font-size:10.5px;color:var(--muted);min-width:34px;text-align:right}
 .progress{position:absolute;left:0;right:0;top:0;height:2px;background:transparent;z-index:30}
 .progress i{display:block;height:100%;width:0;background:var(--accent);transition:width .12s linear}
 .toast{
@@ -459,30 +523,78 @@ function renderLibrary() {
       <div><b>1847–1906</b><span>in print</span></div>
     </div>`;
   wrap.append(head);
-  const grid = el("div", "grid");
-  const books = [...S.catalog.books].sort((a, b) => (a.year || 0) - (b.year || 0));
-  for (const b of books) {
-    const card = el("button", "book");
-    const n = b.counts?.rubrics ?? b.counts?.symptoms ?? 0;
-    const links = b.counts?.remedy_links ?? b.counts?.remedies ?? 0;
-    card.innerHTML = `
-      <span class="tag">${b.type === "materia_medica" ? "materia medica" : "repertory"}</span>
-      <span class="yr">${b.year || ""}${b.parts ? ` · file ${b.part} of ${b.parts}` : ""}</span>
-      <h3>${esc(b.title)}</h3>
-      <span class="au">${esc(b.author || "")}</span>
-      ${b.part_range ? `<span class="range">${esc(b.part_range)}</span>` : ""}
-      <span class="meta"><span><b>${fmt(n)}</b> ${b.type === "materia_medica" ? "symptoms" : "rubrics"}</span>
-      <span><b>${fmt(links)}</b> ${b.type === "materia_medica" ? "remedies" : "links"}</span>
-      ${b.chapters ? `<span><b>${b.chapters.length}</b> ch.</span>` : ""}</span>`;
-    card.onclick = () => openBook(b);
-    grid.append(card);
+
+  // a shelf of covers, in the order the books were printed
+  const books = [...S.catalog.books].sort((a, b) => (a.year || 0) - (b.year || 0) || a.title.localeCompare(b.title));
+  const last = S.recent[0] && S.catalog.books.find(b => b.id === S.recent[0]);
+  if (last) {
+    const r = el("button", "resume");
+    r.style.setProperty("--c1", coverOf(last).c1);
+    r.style.setProperty("--c2", coverOf(last).c2);
+    r.innerHTML = `<span class="mini"></span>
+      <span><h3>${esc(last.title)}</h3><p>Continue reading · ${esc(last.author || "")} · ${last.year || ""}</p></span>
+      <span class="go">Resume →</span>`;
+    r.onclick = () => openBook(last);
+    wrap.append(r);
   }
-  wrap.append(grid);
+
+  const shelf = el("div", "shelf");
+  for (let i = 0; i < books.length; i += 5) {
+    const row = el("div", "shelfrow");
+    const g = el("div", "grid");
+    for (const b of books.slice(i, i + 5)) g.append(coverNode(b));
+    row.append(g);
+    shelf.append(row);
+  }
+  wrap.append(shelf);
   v.append(wrap);
   $("#crumb").textContent = "library";
   document.title = "The Repertory Desk";
   renderRail(null);
   history.replaceState({ view: "library" }, "");
+}
+
+/* a deterministic cover per volume: same book, same colour, no images */
+/* eight book-cloths, like a shelf bound by one binder: the colour is a hash of
+   the volume, so a book keeps its cloth on every visit and every device */
+const CLOTH = [
+  ["#6b2f2a", "#3d1917"],  // oxblood
+  ["#2f4437", "#16241c"],  // forest
+  ["#2e3a58", "#171e2e"],  // indigo
+  ["#7d5320", "#402a10"],  // ochre
+  ["#3b4652", "#1d242b"],  // slate
+  ["#4a2f4a", "#241624"],  // plum
+  ["#44502e", "#22291a"],  // moss
+  ["#1f4646", "#0f2424"],  // teal
+];
+function coverOf(b) {
+  let h = 0;
+  for (const ch of (b.id || b.title || "")) h = (h * 131 + ch.charCodeAt(0)) % 9973;
+  const [c1, c2] = CLOTH[h % CLOTH.length];
+  return { c1, c2, ink: "#f4efe2" };
+}
+
+function coverNode(b) {
+  const c = coverOf(b);
+  const n = b.counts?.rubrics ?? b.counts?.symptoms ?? 0;
+  const el2 = el("button", "cover");
+  el2.style.setProperty("--c1", c.c1);
+  el2.style.setProperty("--c2", c.c2);
+  el2.style.setProperty("--c-ink", c.ink);
+  const initials = (b.title || "").replace(/[^A-Za-z ]/g, "").split(/\s+/).filter(Boolean)
+    .slice(0, 2).map(w => w[0].toUpperCase()).join("");
+  el2.innerHTML = `
+    <span class="art">
+      <span class="mono-year">${b.year || ""}${b.parts ? ` · ${b.part}/${b.parts}` : ""}</span>
+      <span class="t">${esc(b.title)}</span>
+      <span class="rule"></span>
+      <span class="a">${esc(b.author || "")}</span>
+      <span class="n">${initials}</span>
+    </span>
+    <span class="cap"><span><b>${fmt(n)}</b> ${b.type === "materia_medica" ? "symptoms" : "rubrics"}</span>
+      <span>${b.type === "materia_medica" ? "materia medica" : "repertory"}</span></span>`;
+  el2.onclick = () => openBook(b);
+  return el2;
 }
 
 /* ── rendering: rail ────────────────────────────────────────────────────── */
@@ -560,6 +672,30 @@ function renderChapter() {
   const v = $("#view");
   v.innerHTML = "";
   v.scrollTop = 0;
+
+  // a slim bar that keeps the volume and the chapter in view while reading
+  if (S.book) {
+    const c = coverOf(S.book);
+    const bar = el("div", "bookbar");
+    bar.style.setProperty("--c1", c.c1);
+    bar.style.setProperty("--c2", c.c2);
+    const chapIdx = (S.book.chapters || []).findIndex(x => x.file === S.chapter?.file);
+    const chaps = S.book.chapters || [];
+    const label = S.mm ? (S.mm[S.remedy]?.canonical_name || S.mm[S.remedy]?.name || "")
+                       : (S.chapter?.title || S.book.title);
+    bar.innerHTML = `<span class="mini"></span>
+      <span class="ttl">${esc(S.book.title)}</span>
+      <span class="sub">${esc(label)}${chapIdx >= 0 ? ` · chapter ${chapIdx + 1} of ${chaps.length}` : ""}</span>
+      <span class="spacer"></span>
+      ${chapIdx > 0 ? '<button data-step="-1">← previous</button>' : ""}
+      ${chapIdx >= 0 && chapIdx < chaps.length - 1 ? '<button data-step="1">next →</button>' : ""}
+      <span class="pct" id="pct">0%</span>`;
+    bar.querySelectorAll("[data-step]").forEach(b => b.onclick = () => {
+      const nx = chaps[chapIdx + Number(b.dataset.step)];
+      if (nx) openChapter(nx, { push: true });
+    });
+    v.append(bar);
+  }
   const head = el("div", "chapter-head");
   if (S.mm) {
     const rem = S.mm[S.remedy] || {};
@@ -616,6 +752,8 @@ function renderChapter() {
     return;
   }
   renderMore(rows);
+  const firstRub = rows.querySelector(".rub");
+  if (firstRub && !S.query && !S.filterRemedy) firstRub.classList.add("first");
   observer?.disconnect();
   const sentinel = el("div", "sentinel");
   rows.append(sentinel);
@@ -626,7 +764,8 @@ function renderChapter() {
 
   v.onscroll = () => {
     const p = v.scrollTop / Math.max(1, v.scrollHeight - v.clientHeight);
-    $("#crumb").textContent = `${S.book.title.slice(0, 28)}${S.book.title.length > 28 ? "…" : ""} · ${Math.round(p * 100)}%`;
+    const pc = $("#pct"); if (pc) pc.textContent = Math.round(p * 100) + "%";
+    const pr = $("#progressFill"); if (pr) pr.style.width = (p * 100) + "%";
   };
 }
 
@@ -647,7 +786,7 @@ function rubricNode(r, i) {
   n.append(txt);
   const rems = el("div", "rems");
   for (const x of r.rems) {
-    const c = el("button", "chip" + (S.remedyIndex[x.a] ? "" : " unresolved"));
+    const c = el("button", "chip" + (x.g ? " g" + x.g : "") + (S.remedyIndex[x.a] ? "" : " unresolved"));
     c.title = S.remedyIndex[x.a] || "not resolved in the source's abbreviation list";
     const g = el("span", "g");
     for (let k = 0; k < (x.g || 0); k++) g.append(el("i"));
