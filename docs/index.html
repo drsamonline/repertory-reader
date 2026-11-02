@@ -101,6 +101,12 @@ section .sub{color:var(--muted);max-width:60ch;margin:0 0 40px}
 .refuse li{padding-left:24px;position:relative;color:var(--muted);font-size:14.5px}
 .refuse li::before{content:"—";position:absolute;left:0;color:var(--accent)}
 .refuse li b{color:var(--ink);font-weight:600}
+.ask{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-top:30px;padding:16px 20px;
+  border:1px dashed color-mix(in srgb,var(--accent) 45%,var(--rule));border-radius:10px;
+  background:color-mix(in srgb,var(--accent) 5%,transparent)}
+.ask p{margin:0;font-size:13.5px;color:var(--muted);max-width:58ch}
+.ask p b{color:var(--ink)}
+.ask .btn{margin-left:auto;font-size:13px;white-space:nowrap}
 .sources{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:26px}
 .src{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--rule);font-size:13.5px}
 .src span:last-child{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -246,6 +252,12 @@ footer .stamp{margin-left:auto;font-family:var(--mono);font-size:11px;opacity:.7
       <div class="src"><span>Drake — Foot-sweat (1894)</span><span>84</span></div>
       <div class="src"><span>Jahr — Manual, Part I: Materia Medica (1847)</span><span>199 rem.</span></div>
       <div class="src"><span>Bell — Homoeopathic Therapeutics (1906)</span><span>103 rem.</span></div>
+    </div>
+    <div class="ask">
+      <p><b>Have a cleaner scan?</b> Several volumes are marked as damaged or partial
+         extractions — a good OCR copy is what turns one into a readable book. Send the
+         file or a link and it gets rebuilt.</p>
+      <a class="btn ghost" href="mailto:sohilmomin2000@gmail.com?subject=A%20better%20OCR%20scan%20for%20the%20repertory%20library&amp;body=Which%20volume%2C%20and%20where%20the%20scan%20is%20from%3A%0A%0A1.%20%0A%0AA%20link%20(archive.org%2C%20HathiTrust%2C%20Wellcome)%20or%20the%20file%20itself%20is%20fine.%0A">Email a scan — sohilmomin2000@gmail.com</a>
     </div>
   </div>
 </section>

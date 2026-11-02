@@ -217,6 +217,20 @@ aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;
   text-transform:uppercase;background:#00000055;color:#ffd9c9;border:1px solid #ffffff33;
   border-radius:3px;padding:2px 5px;text-align:center;backdrop-filter:blur(2px)}
 .cover.is-damaged .art{filter:saturate(.55)}
+.contribute{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;max-width:1080px;margin:34px auto 0;
+  padding:14px 18px;border:1px dashed color-mix(in srgb,var(--accent) 45%,var(--rule));border-radius:8px;
+  background:color-mix(in srgb,var(--accent) 5%,transparent)
+}
+.contribute p{margin:0;font-size:12.5px;color:var(--muted);max-width:62ch;line-height:1.5}
+.contribute p b{color:var(--ink);font-weight:600}
+.contribute .mailto{
+  margin-left:auto;display:inline-flex;align-items:center;gap:7px;text-decoration:none;
+  border:1px solid var(--accent);color:var(--accent);border-radius:999px;padding:8px 15px;
+  font-size:12.5px;white-space:nowrap;transition:background .16s,color .16s
+}
+.contribute .mailto:hover{background:var(--accent);color:var(--paper)}
+.contribute .addr{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
 .banner{display:flex;gap:10px;align-items:flex-start;margin:0 max(16px,4vw);padding:12px 14px;
   border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:6px;
   background:color-mix(in srgb,var(--accent) 8%,transparent);font-size:12.5px;line-height:1.45;color:var(--ink)}
@@ -636,6 +650,23 @@ function renderLibrary() {
     shelf.append(row);
   }
   wrap.append(shelf);
+
+  // a small ask: a better scan is what turns a damaged extraction into a book
+  const ask = el("div", "contribute");
+  const mail = "mailto:sohilmomin2000@gmail.com"
+    + "?subject=" + encodeURIComponent("A better OCR scan for the repertory library")
+    + "&body=" + encodeURIComponent(
+      "Which volume, and where the scan is from:\n\n"
+      + "1. \n\n"
+      + "A link (archive.org, HathiTrust, Wellcome, your own scan) or the file itself is fine.\n"
+      + "Thank you — it goes straight into the library at\n"
+      + "https://github.com/drsamonline/homoeopathic-materia-medica-repertory-json\n");
+  ask.innerHTML = `<p><b>Have a cleaner scan of one of these volumes?</b>
+      A good OCR copy is what turns a damaged extraction into a readable book — several
+      volumes here are still marked that way. Send the file or a link and I will rebuild it.</p>
+    <a class="mailto" href="${mail}">Email a scan
+      <span class="addr">sohilmomin2000@gmail.com</span></a>`;
+  wrap.append(ask);
   v.append(wrap);
   $("#crumb").textContent = "library";
   document.title = "The Repertory Desk";
@@ -845,7 +876,15 @@ function renderChapter() {
 
   if (S.book?.quality) {
     const ban = el("div", "banner");
-    ban.innerHTML = `<span><b>${S.book.quality === "damaged" ? "damaged scan" : "partial scan"}</b> — ${esc(S.book.quality_note || "this extraction is not reliable.")}</span>`;
+    const m = "mailto:sohilmomin2000@gmail.com"
+      + "?subject=" + encodeURIComponent("A better OCR scan: " + (S.book.title || ""))
+      + "&body=" + encodeURIComponent(
+        "Volume: " + (S.book.title || "") + " (" + (S.book.year || "") + ")\n"
+        + "Author: " + (S.book.author || "") + "\n\n"
+        + "Where the scan is from (link or attachment):\n\n"
+        + "Thank you — it goes straight into the library.\n");
+    ban.innerHTML = `<span><b>${S.book.quality === "damaged" ? "damaged scan" : "partial scan"}</b> — ${esc(S.book.quality_note || "this extraction is not reliable.")}</span>
+      <a class="mailto" href="${m}" style="margin-left:auto;flex:0 0 auto">Send a better scan</a>`;
     v.append(ban);
   }
   const rows = el("div", "rows");
