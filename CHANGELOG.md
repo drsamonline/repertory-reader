@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.7.0 — 2026-11-02
+
+Audit pass over both repositories.
+
+- **The count was wrong on the shelf.** The library headline said "Seventeen
+  repertories" while the statistics counted 18 — because Jahr's *Part I* is one
+  volume in two files. Both now derive from the catalogue: **17 volumes · 18
+  files**, and the headline reads from the same number.
+- **Materia medica pages had no `<h1>`** — the remedy portrait used `<h2>`, so a
+  whole class of volume shipped without a top-level heading. It is an `<h1>` now;
+  every page has exactly one.
+- **Two inline `onclick` handlers** (the retry buttons in the error states) were
+  replaced with delegated listeners — the app now has no inline script handlers.
+- Verified in the same pass: all 18 volumes open with no console errors and no
+  empty states, zero text overlaps at 1440/1024/430 px, and the reader stays
+  responsive after opening eleven chapters and scrolling to the end forty times.
+
 ## 1.6.0 — 2026-11-02
 
 **One remedy is one remedy.** The books print the same drug with whatever spacing,

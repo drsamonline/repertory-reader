@@ -156,7 +156,7 @@ aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;
 .chip.unresolved{font-style:italic;opacity:.82}
 
 .portrait{border-bottom:1px solid var(--rule);padding:0 0 26px;margin:0 0 8px}
-.portrait h2{font-family:var(--serif);font-weight:600;font-size:clamp(24px,3vw,34px);line-height:1.12;margin:.1em 0 .12em}
+.portrait h1{font-family:var(--serif);font-weight:600;font-size:clamp(24px,3vw,34px);line-height:1.12;margin:.1em 0 .12em}
 .portrait .abbr{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--accent);text-transform:uppercase}
 .portrait .facts{display:flex;gap:18px;flex-wrap:wrap;margin:12px 0 0;font-size:12.5px;color:var(--muted)}
 .portrait .facts b{color:var(--ink);font-weight:600}
@@ -648,22 +648,21 @@ function renderLibrary() {
   const v = $("#view");
   v.innerHTML = "";
   const wrap = el("div", "library");
+  const books = [...S.catalog.books].sort((a, b) => (a.year || 0) - (b.year || 0) || a.title.localeCompare(b.title));
+  const volumes = new Set(books.map(b => b.id)).size;   // Jahr is one volume in two files
   const head = el("div", "libhead");
   head.innerHTML = `
-    <h1>Seventeen repertories,<br>one reading room.</h1>
+    <h1>${volumes} volumes,<br>one reading room.</h1>
     <p>Every rubric here is a printed line from a classical repertory, transcribed
        verbatim, with the remedies the book itself sets beside it. Nothing is
        added, nothing is corrected, nothing is ranked. Read, search, compare.</p>
     <div class="stats">
       <div><b>${fmt(S.catalog.totals.repertory_rubrics)}</b><span>rubrics</span></div>
       <div><b>${fmt(S.catalog.totals.remedy_links)}</b><span>remedy links</span></div>
-      <div><b>${S.catalog.books.length}</b><span>volumes</span></div>
+      <div><b>${volumes}</b><span>volumes${books.length > volumes ? ` · ${books.length} files` : ""}</span></div>
       <div><b>1847–1906</b><span>in print</span></div>
     </div>`;
   wrap.append(head);
-
-  // a shelf of covers, in the order the books were printed
-  const books = [...S.catalog.books].sort((a, b) => (a.year || 0) - (b.year || 0) || a.title.localeCompare(b.title));
   const last = S.recent[0] && S.catalog.books.find(b => b.id === S.recent[0]);
   if (last) {
     const r = el("button", "resume");
@@ -935,7 +934,7 @@ function renderChapter() {
       <div class="kicker">${esc(S.book.author || "")} · ${S.book.year || ""}${S.book.parts ? ` · file ${S.book.part} of ${S.book.parts}` : ""}</div>
       <div class="portrait">
         <div class="abbr">${esc(rem.abbrev || "")}</div>
-        <h2>${esc(shown || S.chapter?.title || "Remedy")}</h2>
+        <h1>${esc(shown || S.chapter?.title || "Remedy")}</h1>
         <div class="facts">${facts}</div>
         ${inds.length ? `<h4>Clinical indications</h4><div class="ind">${inds.map(i =>
             `<button class="chip" data-ind="${esc(i)}">${esc(i)}</button>`).join("")}</div>` : ""}
@@ -1100,7 +1099,7 @@ async function openChapter(c, { push = false } = {}) {
     if (push) history.pushState({ book: S.book.id, chapter: c.file }, "");
   } catch (e) {
     v.innerHTML = `<div class="empty">This chapter could not be loaded.<br><small>${esc(String(e.message || e))}</small><br><br>
-      <button class="chip" onclick="location.reload()">Try again</button></div>`;
+      <button class="chip" data-retry>Try again</button></div>`;
   }
 }
 
@@ -1308,7 +1307,7 @@ async function boot() {
   } catch (e) {
     $("#view").innerHTML = `<div class="empty">The library could not be reached.<br>
       <small>${esc(String(e.message || e))}</small><br><br>
-      <button class="chip" onclick="location.reload()">Retry</button></div>`;
+      <button class="chip" data-retry>Retry</button></div>`;
     return;
   }
   renderLibrary();
@@ -1347,6 +1346,7 @@ $("#palInput").onkeydown = e => {
 };
 $("#overlay").onclick = e => { if (e.target.id === "overlay") Pal.close(); };
 $("#supportBtn").onclick = () => { const d = $("#supportDlg"); d.showModal(); };
+document.addEventListener("click", e => { if (e.target.closest("[data-retry]")) location.reload(); });
 $("#supportDlg").addEventListener("click", e => {
   if (e.target === $("#supportDlg") || e.target.closest("[data-close]")) $("#supportDlg").close();
 });
