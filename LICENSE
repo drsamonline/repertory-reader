@@ -1,0 +1,19 @@
+CC0 1.0 Universal — public domain dedication
+============================================
+
+The Repertory Desk (the reader in docs/) is dedicated to the public domain under
+CC0 1.0 Universal: https://creativecommons.org/publicdomain/zero/1.0/
+
+To the extent possible under law, Dr. Sohil Momin has waived all copyright and
+related or neighbouring rights to this work. You may copy, modify, distribute and
+use it, including commercially, without asking permission.
+
+Attribution is not required by the licence, but it is asked for: if you build on
+this reader, say where it came from — https://github.com/drsamonline/repertory-reader
+
+The library this reader loads (drsamonline/homoeopathic-materia-medica-repertory-json)
+carries its own licence. Its compiled public-domain datasets are CC0; the folder
+repertory/repertorium-publicum-2008/ is third-party material under GNU GPL v3 and
+is not covered by that dedication. This reader does not ship any of that data —
+it reads it from the library at runtime — but anyone redistributing the library
+must honour those terms.
