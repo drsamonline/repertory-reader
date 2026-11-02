@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.3.1 — 2026-11-02
+
+Interaction and performance pass, driven by clicking every control in a headless
+browser and watching for errors and dead ends rather than guessing.
+
+- **The rail toggle was dead on desktop** — it only had an effect under 820px.
+  It now folds the rail away at any width; on a phone it opens the overlay, a
+  scrim closes it, and choosing a chapter closes it too.
+- **The row loader could stall and could cascade.** An IntersectionObserver only
+  fires when the sentinel *changes* state, so after a batch that left it visible
+  nothing fired again (the list stopped growing), and a fast scroll could queue
+  batch after batch in one go (the page locked). It now pumps explicitly, one
+  batch per animation frame, until the viewport is covered — and never re-enters.
+- **Search is indexed.** Every loaded chapter keeps one lowercase copy of its text
+  and a remedy → rubric map, built once at load. Typing used to lowercase the
+  whole volume on each keystroke; on Knerr's 131,685 rubrics that was the sticky
+  feeling. Remedy lookups are now a map hit, not a scan.
+- **Memory is bounded**: at most eight chapters are kept in the search pool.
+- **The support button opened a toast.** It opens a real dialog — portrait, UPI
+  with copy and QR, Ko-fi, PayPal, the bookstore, the hub and email.
+- **The header crumb** now names the volume you are reading instead of always
+  saying "library".
+
 ## 1.2.0 — 2026-11-02
 
 A design pass. The reader was correct and plain; a repertory is a printed book,
