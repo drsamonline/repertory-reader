@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.5.0 — 2026-11-02
+
+- **A Wanted shelf.** Volumes that are not in the library, or that were extracted and
+  held back because the scan in hand is not readable, now appear on the shelf as
+  dashed ghost covers — with their state ("not extracted", "in progress", "extracted,
+  held", "better scan wanted") and a line on why. Each one *is* the request: clicking
+  a ghost cover opens a mail draft to sohilmomin2000@gmail.com with that volume's
+  title, author and year already filled in.
+- Six to start: Ruoff 1845, Lee's *Characteristic Symptoms*, Jahr's Part II repertory,
+  Kimball 1888, Worcester 1880, and a complete Kent 1897.
+- The generic "have a cleaner scan?" strip is suppressed when the Wanted shelf is
+  present, so the ask is not made twice on the same page.
+
 ## 1.4.1 — 2026-11-02
 
 - **No text overlaps anywhere.** A geometry probe now walks every leaf text node at

@@ -222,6 +222,25 @@ aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;
   text-transform:uppercase;background:#00000055;color:#ffd9c9;border:1px solid #ffffff33;
   border-radius:3px;padding:2px 5px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .cover.is-damaged .art{filter:saturate(.55)}
+.wanthead{max-width:1080px;margin:46px auto 16px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.wanthead h2{font-family:var(--serif);font-size:20px;font-weight:600;margin:0}
+.wanthead p{margin:0;font-size:12.5px;color:var(--muted);max-width:60ch}
+.cover.wanted{cursor:pointer}
+.cover.wanted .art{
+  background:none;border:1px dashed color-mix(in srgb,var(--rule) 130%,transparent);
+  box-shadow:none;color:var(--ink);opacity:.9
+}
+.cover.wanted .art::before{display:none}
+.cover.wanted .art::after{display:none}
+.cover.wanted:hover .art{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 4%,transparent)}
+.cover.wanted .mono-year{color:var(--muted);opacity:1}
+.cover.wanted .t{color:var(--ink);opacity:.92}
+.cover.wanted .a{color:var(--muted);opacity:1}
+.cover.wanted .rule{background:var(--rule);opacity:1}
+.cover.wanted .n{color:var(--muted);opacity:.6}
+.cover .wanttag{align-self:flex-start;margin:7px 0 0;font-size:9px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);
+  border-radius:3px;padding:2px 5px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .contribute{
   display:flex;align-items:center;gap:14px;flex-wrap:wrap;max-width:1080px;margin:34px auto 0;
   padding:14px 18px;border:1px dashed color-mix(in srgb,var(--accent) 45%,var(--rule));border-radius:8px;
@@ -660,8 +679,25 @@ function renderLibrary() {
   }
   wrap.append(shelf);
 
-  // a small ask: a better scan is what turns a damaged extraction into a book
+  // volumes we want but cannot show: listed so a reader with a scan can send it
+  const wanted = S.catalog.wanted || [];
+  if (wanted.length) {
+    const wh = el("div", "wanthead");
+    wh.innerHTML = `<h2>Wanted</h2>
+      <p>Volumes not in the library yet, or held back because the scan in hand is not good
+         enough to read. If you have a copy, the button on any of these writes the request for you.</p>`;
+    wrap.append(wh);
+    const wshelf = el("div", "shelf");
+    const wrow = el("div", "shelfrow");
+    const wg = el("div", "grid");
+    for (const w of wanted) wg.append(wantedNode(w));
+    wrow.append(wg); wshelf.append(wrow);
+    wrap.append(wshelf);
+  }
+
+  // the generic ask only when there is no Wanted shelf making it per volume
   const ask = el("div", "contribute");
+  if (wanted.length) ask.style.display = "none";
   const mail = "mailto:sohilmomin2000@gmail.com"
     + "?subject=" + encodeURIComponent("A better OCR scan for the repertory library")
     + "&body=" + encodeURIComponent(
@@ -730,6 +766,38 @@ function coverNode(b) {
       <span>${b.type === "materia_medica" ? "materia medica" : "repertory"}</span></span>`;
   el2.onclick = () => openBook(b);
   return el2;
+}
+
+function mailtoFor(w) {
+  const subject = "A scan for: " + (w.title || "") + (w.year ? " (" + w.year + ")" : "");
+  const body = "Volume: " + (w.title || "") + "\n"
+    + "Author: " + (w.author || "") + "\n"
+    + "Year: " + (w.year || "") + "\n\n"
+    + "Where the scan is from (link or attachment):\n\n"
+    + "Thank you — it goes straight into the library.\n";
+  return "mailto:sohilmomin2000@gmail.com?subject=" + encodeURIComponent(subject)
+       + "&body=" + encodeURIComponent(body);
+}
+
+function wantedNode(w) {
+  const a = el("a", "cover wanted");
+  a.href = mailtoFor(w);
+  a.title = w.note || "";
+  const initials = (w.title || "").replace(/[^A-Za-z ]/g, "").split(/\s+/).filter(Boolean)
+    .slice(0, 2).map(x => x[0].toUpperCase()).join("");
+  a.innerHTML = `
+    <span class="art">
+      <span class="head">
+        <span class="mono-year">${w.year || ""}</span>
+        <span class="n">${initials}</span>
+      </span>
+      <span class="wanttag">${esc(w.state || "wanted")}</span>
+      <span class="t">${esc(w.title)}</span>
+      <span class="rule"></span>
+      <span class="a">${esc(w.author || "")}</span>
+    </span>
+    <span class="cap"><span><b>Send a scan</b></span><span>${esc(w.state || "")}</span></span>`;
+  return a;
 }
 
 /* ── rendering: rail ────────────────────────────────────────────────────── */
