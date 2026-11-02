@@ -84,6 +84,10 @@ header.bar{
 main{display:grid;grid-template-columns:264px minmax(0,1fr);min-height:0;min-width:0}
 main.no-rail{grid-template-columns:0 minmax(0,1fr)}
 main.no-rail aside.rail{overflow:hidden;padding:0;border:0}
+main.rail-hidden{grid-template-columns:0 minmax(0,1fr)}
+main.rail-hidden aside.rail{overflow:hidden;padding:0;border:0;visibility:hidden}
+.scrim{position:fixed;inset:54px 0 0 0;background:#0006;z-index:39;display:none}
+.scrim.on{display:block}
 
 /* ── rail ───────────────────────────────────────────────────────────────── */
 aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;background:color-mix(in srgb,var(--paper) 92%,var(--card))}
@@ -118,6 +122,7 @@ aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;
 
 .rows{padding:0 max(16px,4vw) 120px;max-width:calc(var(--measure) + 12vw);margin:0 auto}
 .rub{
+  content-visibility:auto;contain-intrinsic-size:auto 64px;
   display:grid;grid-template-columns:1fr auto;gap:4px 20px;align-items:start;
   padding:14px 0 13px;border-bottom:1px solid color-mix(in srgb,var(--rule) 62%, transparent);
 }
@@ -274,6 +279,32 @@ aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;
 .bookbar .pct{font-family:var(--mono);font-size:10.5px;color:var(--muted);min-width:34px;text-align:right}
 .progress{position:absolute;left:0;right:0;top:0;height:2px;background:transparent;z-index:30}
 .progress i{display:block;height:100%;width:0;background:var(--accent);transition:width .12s linear}
+dialog#supportDlg{
+  border:1px solid var(--rule);border-radius:12px;padding:0;max-width:640px;width:calc(100% - 32px);
+  background:var(--card);color:var(--ink);box-shadow:0 30px 90px #0007;color-scheme:inherit
+}
+dialog#supportDlg::backdrop{background:#0007;backdrop-filter:blur(2px)}
+.sup-head{display:flex;gap:14px;align-items:flex-start;padding:20px 22px 12px}
+.sup-head img{width:56px;height:56px;border-radius:50%;object-fit:cover;border:1px solid var(--rule)}
+.sup-head h3{margin:0 0 4px;font-family:var(--serif);font-size:19px;font-weight:600}
+.sup-head p{margin:0;font-size:12.5px;color:var(--muted);max-width:44ch}
+.sup-x{margin-left:auto;font-size:20px;line-height:1;color:var(--muted);padding:2px 6px;border-radius:6px}
+.sup-x:hover{background:var(--accent-soft);color:var(--ink)}
+.sup-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;padding:6px 22px 4px}
+.sup-card{border:1px solid var(--rule);border-radius:8px;padding:11px 13px;background:var(--paper)}
+.sup-card h4{margin:0 0 6px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.sup-card p{margin:4px 0;font-size:12.5px}
+.sup-card a{color:var(--accent);text-decoration:none}
+.sup-card a:hover{text-decoration:underline}
+.sup-id{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sup-id code{font-family:var(--mono);font-size:12px;border:1px dashed var(--rule);border-radius:5px;padding:2px 6px}
+.sup-copy{font-size:10px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--rule);
+  border-radius:5px;padding:2px 7px;color:var(--muted)}
+.sup-copy:hover{color:var(--ink);border-color:var(--ink)}
+.sup-qr{display:flex;gap:10px;align-items:center;margin-top:8px}
+.sup-qr img{width:112px;height:112px;background:#fff;padding:5px;border-radius:6px;border:1px solid var(--rule)}
+.sup-qr small{font-size:11px;color:var(--muted);max-width:12ch;line-height:1.35}
+.sup-foot{margin:10px 22px 18px;font-size:11px;color:var(--muted)}
 .toast{
   position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--ink);color:var(--paper);
   padding:9px 16px;border-radius:999px;font-size:12.5px;opacity:0;pointer-events:none;transition:.28s;z-index:80
@@ -329,6 +360,7 @@ aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;
   </main>
 </div>
 
+<div class="scrim"></div>
 <div class="overlay" id="overlay">
   <div class="palette" role="dialog" aria-modal="true" aria-label="Search">
     <div class="field">
@@ -343,6 +375,35 @@ aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;
     </div>
   </div>
 </div>
+<dialog id="supportDlg" aria-labelledby="supH">
+  <div class="sup-head">
+    <img src="../assets/support-portrait.jpg" alt="Dr. Sohil Momin" width="56" height="56" loading="lazy">
+    <div><h3 id="supH">Support this work</h3>
+      <p>Free, offline, accountless. If it earned its keep, pick whatever is easiest where you are.</p></div>
+    <button class="sup-x" aria-label="Close" data-close>×</button>
+  </div>
+  <div class="sup-grid">
+    <div class="sup-card">
+      <h4>UPI (India)</h4>
+      <div class="sup-id"><code id="vpa">drsohilboi@ybl</code>
+        <button class="sup-copy" data-copy="drsohilboi@ybl">Copy</button></div>
+      <div class="sup-qr">
+        <img src="../assets/upi-qr.svg" alt="UPI QR for drsohilboi@ybl" width="112" height="112" loading="lazy">
+        <small>Open amount — pay what you like. Works in any UPI app.</small>
+      </div>
+      <p><a href="upi://pay?pa=drsohilboi%40ybl&amp;pn=Dr.%20Sohil%20Momin&amp;cu=INR">Open in a UPI app</a></p>
+    </div>
+    <div class="sup-card"><h4>Elsewhere</h4>
+      <p><a href="https://ko-fi.com/matneo" target="_blank" rel="noopener noreferrer">Ko-fi</a></p>
+      <p><a href="https://paypal.me/drsohilmomin?locale.x=en_GB&amp;country.x=IN" target="_blank" rel="noopener noreferrer">PayPal</a></p></div>
+    <div class="sup-card"><h4>The books</h4>
+      <p><a href="https://www.amazon.com/stores/author/B08ZT331LY/allbooks?ccs_id=aed72b9f-71d9-41dc-adee-e9368a317acc" target="_blank" rel="noopener noreferrer">Amazon bookstore</a></p></div>
+    <div class="sup-card"><h4>Keep in touch</h4>
+      <p><a href="https://drsamonline.github.io/" target="_blank" rel="noopener noreferrer">All projects</a></p>
+      <p><a href="mailto:sohilmomin2000@gmail.com">sohilmomin2000@gmail.com</a></p></div>
+  </div>
+  <p class="sup-foot">No feature here is behind a payment, and nothing is asked for on load.</p>
+</dialog>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -415,6 +476,26 @@ const Store = (() => {
 
 /* ── fetch layer: memory → IndexedDB → CDN → raw ────────────────────────── */
 const mem = new Map();
+/* one lowercase copy of every loaded chapter's text, and a remedy -> rubric map,
+   built once at load. Searching used to lowercase the whole book on each
+   keystroke, which is what made typing feel sticky on a 131,000-rubric volume. */
+const idxCache = new Map();
+function buildIndex(path, rubrics) {
+  if (idxCache.has(path)) return idxCache.get(path);
+  const lower = rubrics.map(r => (r.t || "").toLowerCase());
+  const byRemedy = new Map();
+  rubrics.forEach((r, i) => {
+    for (const x of r.rems) {
+      const a = String(x.a).toLowerCase();
+      let set = byRemedy.get(a);
+      if (!set) byRemedy.set(a, set = []);
+      set.push(i);
+    }
+  });
+  const idx = { lower, byRemedy };
+  idxCache.set(path, idx);
+  return idx;
+}
 const inflight = new Map();
 
 async function load(path, { refresh = false } = {}) {
@@ -621,6 +702,7 @@ function renderRail(kind = "chapters") {
   rail.append(back);
 
   if (S.mm) {
+    rail.querySelectorAll(".tabs").forEach(t => t.remove());
     rail.append(el("h4", null, "Remedies in this volume"));
     S.mm.forEach((rem, i) => {
       const n = S.rubrics.filter(r => r.rem === i).length;
@@ -654,7 +736,12 @@ function renderRail(kind = "chapters") {
       it.innerHTML = `<i>${romanise(i + 1)}</i><span>${esc(c.title)}</span><em>${c.rubrics ? fmt(c.rubrics) : ""}</em>`;
       const active = c.sec != null ? S.activeSection === c.sec : S.chapter?.file === c.file;
       it.setAttribute("aria-current", String(active));
-      it.onclick = () => c.sec != null ? showSection(c.sec, c.title) : openChapter(c);
+      it.onclick = () => {
+        if (window.matchMedia("(max-width:820px)").matches) {
+          $("#rail").classList.remove("open"); $(".scrim").classList.remove("on");
+        }
+        return c.sec != null ? showSection(c.sec, c.title) : openChapter(c);
+      };
       rail.append(it);
     });
   } else {
@@ -676,8 +763,9 @@ const ROMAN = [[1000, "m"], [900, "cm"], [500, "d"], [400, "cd"], [100, "c"], [9
 function romanise(n) { let s = ""; for (const [v, r] of ROMAN) while (n >= v) { s += r; n -= v; } return s; }
 
 /* ── rendering: chapter ─────────────────────────────────────────────────── */
-const PAGE = 60;
+const PAGE = 80;
 let viewRows = [], rendered = 0, observer = null;
+let sentinelEl = null, rowsEl = null, pumpQueued = false;
 
 function renderChapter() {
   const v = $("#view");
@@ -767,15 +855,16 @@ function renderChapter() {
     rows.append(el("div", "empty", "Nothing matches here."));
     return;
   }
+  rowsEl = rows;
   renderMore(rows);
   const firstRub = rows.querySelector(".rub");
   if (firstRub && !S.query && !S.filterRemedy) firstRub.classList.add("first");
   observer?.disconnect();
   const sentinel = el("div", "sentinel");
   rows.append(sentinel);
-  observer = new IntersectionObserver(es => {
-    if (es.some(e => e.isIntersecting)) renderMore(rows);
-  }, { root: v, rootMargin: "900px" });
+  sentinelEl = sentinel;
+  observer = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) pump(); },
+                                      { root: v, rootMargin: "600px" });
   observer.observe(sentinel);
 
   v.onscroll = () => {
@@ -785,7 +874,26 @@ function renderChapter() {
   };
 }
 
+/* Fill until the viewport is covered, one batch per frame.
+   An IntersectionObserver only fires when the sentinel *changes* state, so after
+   a batch that leaves it still visible nothing would fire again and the list
+   would stall — this pumps explicitly instead, and stops as soon as the sentinel
+   is out of the margin. */
+function pump() {
+  if (pumpQueued || !rowsEl || rendered >= viewRows.length) return;
+  pumpQueued = true;
+  requestAnimationFrame(() => {
+    pumpQueued = false;
+    renderMore(rowsEl);
+    const sv = sentinelEl, view = $("#view");
+    if (!sv || !view) return;
+    const r = sv.getBoundingClientRect(), vr = view.getBoundingClientRect();
+    if (r.top < vr.bottom + 600 && rendered < viewRows.length) pump();
+  });
+}
+
 function renderMore(rows) {
+  if (rendered >= viewRows.length) return;
   const frag = document.createDocumentFragment();
   const end = Math.min(rendered + PAGE, viewRows.length);
   for (let i = rendered; i < end; i++) frag.append(rubricNode(viewRows[i], i));
@@ -852,9 +960,14 @@ async function openChapter(c, { push = false } = {}) {
       viewRows = mmRows(0);
     } else if (secs.length > 1) viewRows = rubrics.filter(r => r.sec === 0);
     S.loaded.set(c.file, rubrics);
+    if (S.loaded.size > 8) {                       // drop the oldest, keep the pool small
+      const oldest = S.loaded.keys().next().value;
+      if (oldest !== c.file) { S.loaded.delete(oldest); idxCache.delete(oldest); }
+    }
     if (!S.mm && secs.length <= 1) viewRows = rubrics;   // else it is set above
     renderRail("chapters");     // the payload's sections are known only now
     renderChapter();
+    $("#crumb").textContent = S.book.title.length > 34 ? S.book.title.slice(0, 34) + "…" : S.book.title;
     document.title = `${c.title} — ${S.book.title}`;
     if (push) history.pushState({ book: S.book.id, chapter: c.file }, "");
   } catch (e) {
@@ -930,34 +1043,36 @@ const Pal = {
     const box = $("#palResults");
     if (q.length < 2) { box.innerHTML = ""; $("#palCount").textContent = "type at least two letters"; return; }
     const hits = [];
-    const push = (r, where, book) => {
-      const i = r.t.toLowerCase().indexOf(q);
-      if (i < 0) return;
-      hits.push({ r, where, book, i, q });
+    const LIMIT = 300;
+    const add = (r, where, book, pos) => {
+      if (hits.length >= LIMIT) return;
+      hits.push({ r, where, book, i: pos ?? -1, q });
     };
-    if (S.mm) {
-      // in a materia medica the remedy name is the way in
-      S.mm.forEach((rem, ri) => {
-        const nm = ((rem.canonical_name || "") + " " + (rem.name || "") + " " + (rem.abbrev || "")).toLowerCase();
-        if (nm.includes(q)) for (const r of S.rubrics) if (r.rem === ri && hits.length < 300) hits.push({ r, where: rem.canonical_name || rem.name, book: S.book, i: -1, q });
-      });
-    }
+    const scan = (rubs, path, where, book) => {
+      const ix = buildIndex(path || "mem", rubs);
+      let n = 0;
+      for (let k = 0; k < ix.lower.length && hits.length < LIMIT; k++) {
+        const pos = ix.lower[k].indexOf(q);
+        if (pos >= 0) { add(rubs[k], where, book, pos); n++; }
+      }
+      // remedies: a lookup, not a scan
+      for (const [abbrev, ids] of ix.byRemedy) {
+        if (hits.length >= LIMIT) break;
+        if (abbrev.startsWith(q) || (S.remedyIndex[abbrev] || "").toLowerCase().includes(q))
+          for (const i of ids) { if (hits.length >= LIMIT) break; add(rubs[i], where, book, -1); }
+      }
+      return n;
+    };
+
     if (Pal.scope === "chapter" && S.rubrics.length) {
-      for (const r of S.rubrics) { if (hits.length > 400) break; push(r, S.chapter?.title || "", S.book); }
+      scan(S.rubrics, S.chapter?.file || "cur", S.chapter?.title || "", S.book);
     } else {
       for (const [path, rubs] of S.loaded) {
-        const book = S.catalog.books.find(b => b.path === path || b.chapters?.some(c => c.file === path));
+        const book = S.catalog.books.find(b => b.path === path || b.chapters?.some(c => c.file === path)) || S.book;
         const where = S.catalog.books.find(b => b.path === path)?.title
           || book?.chapters?.find(c => c.file === path)?.title || path;
-        for (const r of rubs) { if (hits.length > 600) break; push(r, where, book); }
-      }
-    }
-    // remedy-abbreviation hits
-    if (q.length >= 2) {
-      for (const r of (Pal.scope === "chapter" ? S.rubrics : [...S.loaded.values()].flat())) {
-        if (hits.length > 700) break;
-        if (r.rems.some(x => x.a.toLowerCase() === q || (S.remedyIndex[x.a] || "").toLowerCase().includes(q)))
-          hits.push({ r, where: r.ch || "", book: S.book, i: 0, q, rem: true });
+        scan(rubs, path, where, book);
+        if (hits.length >= LIMIT) break;
       }
     }
     Pal.hits = hits.slice(0, 300);
@@ -1062,7 +1177,15 @@ async function boot() {
 
 /* ── events ─────────────────────────────────────────────────────────────── */
 $("#themeBtn").onclick = cycleTheme;
-$("#railToggle").onclick = () => $("#rail").classList.toggle("open");
+$("#railToggle").onclick = () => {
+  if (window.matchMedia("(max-width:820px)").matches) {
+    const open = $("#rail").classList.toggle("open");
+    $(".scrim").classList.toggle("on", open);
+  } else {
+    $("#main").classList.toggle("rail-hidden");   // desktop: fold the rail away
+  }
+};
+$(".scrim").onclick = () => { $("#rail").classList.remove("open"); $(".scrim").classList.remove("on"); };
 $("#searchInput").onfocus = () => { $("#searchInput").blur(); Pal.show(S.book ? "chapter" : "all"); };
 $("#searchInput").onclick = e => { e.preventDefault(); Pal.show(S.book ? "chapter" : "all"); };
 $("#palInput").oninput = e => Pal.run(e.target.value);
@@ -1073,7 +1196,19 @@ $("#palInput").onkeydown = e => {
   else if (e.key === "Escape") Pal.close();
 };
 $("#overlay").onclick = e => { if (e.target.id === "overlay") Pal.close(); };
-$("#supportBtn").onclick = () => toast("Support: see the landing page footer");
+$("#supportBtn").onclick = () => { const d = $("#supportDlg"); d.showModal(); };
+$("#supportDlg").addEventListener("click", e => {
+  if (e.target === $("#supportDlg") || e.target.closest("[data-close]")) $("#supportDlg").close();
+});
+$("#supportDlg").querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", async () => {
+  const v = b.getAttribute("data-copy");
+  try { await navigator.clipboard.writeText(v); b.textContent = "Copied"; }
+  catch {
+    const r = document.createRange(); r.selectNodeContents($("#vpa"));
+    const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); b.textContent = "Select";
+  }
+  setTimeout(() => b.textContent = "Copy", 1600);
+}));
 
 document.addEventListener("keydown", e => {
   const typing = /input|textarea/i.test(e.target.tagName);

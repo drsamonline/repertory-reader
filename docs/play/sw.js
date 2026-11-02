@@ -2,7 +2,7 @@
    HTML is network-first so a release is never hidden behind a stale cache;
    the library JSON is cache-first with a background refresh, which is what
    makes a second visit work with no connection at all. */
-const CACHE = "repertory-desk-v1.3.0-2026-11-02";
+const CACHE = "repertory-desk-v1.3.1-2026-11-02";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icon.svg"];
 
 self.addEventListener("install", e => {
