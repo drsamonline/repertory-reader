@@ -2,7 +2,7 @@
    HTML is network-first so a release is never hidden behind a stale cache;
    the library JSON is cache-first with a background refresh, which is what
    makes a second visit work with no connection at all. */
-const CACHE = "repertory-desk-v1.2.0-2026-11-02";
+const CACHE = "repertory-desk-v1.3.0-2026-11-02";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icon.svg"];
 
 self.addEventListener("install", e => {
@@ -18,7 +18,8 @@ self.addEventListener("fetch", e => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   const isDoc = req.mode === "navigate" || (req.headers.get("accept") || "").includes("text/html");
-  const isLib = /\.json$/.test(url.pathname) || url.pathname.endsWith("/catalog.json");
+  const isLib = /\.json$/.test(url.pathname);
+  const isCatalog = url.pathname.endsWith("/catalog.json");
 
   if (isDoc) {
     e.respondWith(
@@ -27,6 +28,18 @@ self.addEventListener("fetch", e => {
         caches.open(CACHE).then(c => c.put(req, copy));
         return r;
       }).catch(() => caches.match(req).then(r => r || caches.match("index.html")))
+    );
+    return;
+  }
+  if (isCatalog) {
+    // the manifest changes when a volume is renamed or re-extracted, so it is
+    // network-first; the cached copy is only the offline fallback
+    e.respondWith(
+      fetch(req).then(r => {
+        const copy = r.clone();
+        caches.open(CACHE).then(c => c.put(req, copy));
+        return r;
+      }).catch(() => caches.match(req))
     );
     return;
   }

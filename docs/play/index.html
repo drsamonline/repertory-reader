@@ -208,6 +208,14 @@ aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;
   border:1px solid currentColor;border-radius:2px;padding:1px 4px}
 .cover .cap{margin-top:9px;font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
 .cover .cap b{color:var(--ink);font-weight:600}
+.cover .warn{position:absolute;left:8px;top:8px;right:8px;font-size:9.5px;letter-spacing:.1em;
+  text-transform:uppercase;background:#00000055;color:#ffd9c9;border:1px solid #ffffff33;
+  border-radius:3px;padding:2px 5px;text-align:center;backdrop-filter:blur(2px)}
+.cover.is-damaged .art{filter:saturate(.55)}
+.banner{display:flex;gap:10px;align-items:flex-start;margin:0 max(16px,4vw);padding:12px 14px;
+  border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:6px;
+  background:color-mix(in srgb,var(--accent) 8%,transparent);font-size:12.5px;line-height:1.45;color:var(--ink)}
+.banner b{color:var(--accent);letter-spacing:.06em;text-transform:uppercase;font-size:10.5px}
 .resume{
   display:flex;align-items:center;gap:18px;max-width:1080px;margin:0 auto 42px;padding:16px 20px;
   border:1px solid var(--rule);border-radius:10px;background:var(--glow);box-shadow:var(--shadow);text-align:left;width:100%
@@ -583,8 +591,11 @@ function coverNode(b) {
   el2.style.setProperty("--c-ink", c.ink);
   const initials = (b.title || "").replace(/[^A-Za-z ]/g, "").split(/\s+/).filter(Boolean)
     .slice(0, 2).map(w => w[0].toUpperCase()).join("");
+  const flag = b.quality ? `<span class="warn">${b.quality === "damaged" ? "damaged scan" : "partial scan"}</span>` : "";
+  if (b.quality) el2.classList.add("is-damaged");
+  el2.title = b.quality_note || "";
   el2.innerHTML = `
-    <span class="art">
+    <span class="art">${flag}
       <span class="mono-year">${b.year || ""}${b.parts ? ` · ${b.part}/${b.parts}` : ""}</span>
       <span class="t">${esc(b.title)}</span>
       <span class="rule"></span>
@@ -744,6 +755,11 @@ function renderChapter() {
   }
   v.append(head);
 
+  if (S.book?.quality) {
+    const ban = el("div", "banner");
+    ban.innerHTML = `<span><b>${S.book.quality === "damaged" ? "damaged scan" : "partial scan"}</b> — ${esc(S.book.quality_note || "this extraction is not reliable.")}</span>`;
+    v.append(ban);
+  }
   const rows = el("div", "rows");
   v.append(rows);
   rendered = 0;
