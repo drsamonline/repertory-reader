@@ -1,0 +1,15 @@
+{
+  "name": "The Repertory Desk",
+  "short_name": "Repertory",
+  "description": "A quiet reading room for seventeen classical homoeopathic repertories and materia medicas — 271,421 rubrics, read straight from the open JSON library.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4efe4",
+  "theme_color": "#f4efe4",
+  "orientation": "any",
+  "categories": ["books", "medical", "education"],
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
