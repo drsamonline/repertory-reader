@@ -340,9 +340,13 @@ async function load(path, { refresh = false } = {}) {
       }
     }
     let text, err;
-    for (const base of [CDN, RAW]) {
+    // the catalog changes when a book is renamed, and jsDelivr's @main alias can
+    // hold a stale copy for hours — so it is read from raw first. Chapters are
+    // immutable once published, so they take the faster CDN.
+    const order = path.endsWith("catalog.json") ? [RAW, CDN] : [CDN, RAW];
+    for (const base of order) {
       try {
-        const r = await fetch(base + path, { cache: "force-cache" });
+        const r = await fetch(base + path, { cache: path.endsWith("catalog.json") ? "no-cache" : "force-cache" });
         if (!r.ok) throw new Error(r.status + " " + r.statusText);
         text = await r.text(); err = null; break;
       } catch (e) { err = e; }
