@@ -27,7 +27,7 @@ evidence; a reader that starts guessing stops being evidence.
 
 | | |
 |---|---|
-| **Read** | Chapter by chapter, in the printed order. Knerr's 43 chapters, Kent's 34, Gentry's A–Z; single-file volumes build their contents from the sections inside the file. |
+| **Read** | A repertory opens chapter by chapter, in the printed order; a materia medica opens by remedy, with its portrait, clinical indications and symptoms grouped by chapter. Knerr's 43 chapters, Kent's 34, Gentry's A–Z; single-file volumes build their contents from the sections inside the file. |
 | **Search** | Three scopes — the open chapter, the volume, then every volume already on your device. Remedy abbreviations and resolved names are searched too. |
 | **Follow** | Remedy chips filter a volume to the rubrics that carry them; the rail can list a volume by its drugs instead of its chapters. |
 | **Themes** | Paper, vellum, sage, slate, lampblack — remembered per device, with serif text at a measured line length. |

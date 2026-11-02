@@ -136,6 +136,22 @@ aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;
 .chip .g i{width:3.5px;height:3.5px;border-radius:50%;background:currentColor;opacity:.85}
 .chip.unresolved{font-style:italic;opacity:.82}
 
+.portrait{border-bottom:1px solid var(--rule);padding:0 0 26px;margin:0 0 8px}
+.portrait h2{font-family:var(--serif);font-weight:600;font-size:clamp(24px,3vw,34px);line-height:1.12;margin:.1em 0 .12em}
+.portrait .abbr{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--accent);text-transform:uppercase}
+.portrait .facts{display:flex;gap:18px;flex-wrap:wrap;margin:12px 0 0;font-size:12.5px;color:var(--muted)}
+.portrait .facts b{color:var(--ink);font-weight:600}
+.portrait h4{margin:20px 0 8px;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.ind{display:flex;flex-wrap:wrap;gap:5px}
+.ind .chip{cursor:pointer}
+.chapt{
+  font-family:var(--sans);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);
+  font-weight:600;padding:26px 0 8px;border-bottom:1px solid var(--rule);margin-bottom:2px
+}
+.chapt:first-child{padding-top:14px}
+.rub .ctx{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.mod{display:inline-flex;gap:4px;align-items:center;font-size:11px;color:var(--muted);margin-top:4px}
+.mod i{font-style:normal;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;font-size:9.5px}
 .empty{padding:64px 24px;text-align:center;color:var(--muted);font-family:var(--serif);font-size:17px}
 .sentinel{height:1px}
 
@@ -379,6 +395,8 @@ const S = {
   remedyIndex: {},     // abbrev -> name
   loaded: new Map(),   // path -> rubrics[]  (whole-book search)
   sectionsMeta: [],    // the payload's own sections, for single-file books
+  mm: null,            // remedies, when the volume is a materia medica
+  remedy: null,        // the open remedy index in that volume
   activeSection: null,
   theme: localStorage.getItem(LS + "theme") || "paper",
   recent: JSON.parse(localStorage.getItem(LS + "recent") || "[]"),
@@ -388,9 +406,15 @@ const S = {
 function normalise(data) {
   const out = [];
   if (data.type === "materia_medica") {
-    for (const rem of data.remedies || [])
+    // a materia medica is remedy -> symptoms, so every row remembers which
+    // remedy it belongs to and which labelled group of that remedy it sits in
+    (data.remedies || []).forEach((rem, ri) => {
       for (const s of rem.symptoms || [])
-        out.push({ t: s.text, p: null, rems: [], ch: rem.name, chp: s.chapter || "General" });
+        out.push({
+          t: s.text || "", p: null, rems: [], rem: ri,
+          ch: s.chapter || "General", mods: s.modalities || []
+        });
+    });
     return out;
   }
   const sections = data.section ? [data.section] : (data.sections || []);
@@ -471,6 +495,20 @@ function renderRail(kind = "chapters") {
   back.onclick = () => { S.book = null; S.chapter = null; S.rubrics = []; renderLibrary(); };
   rail.append(back);
 
+  if (S.mm) {
+    rail.append(el("h4", null, "Remedies in this volume"));
+    S.mm.forEach((rem, i) => {
+      const n = S.rubrics.filter(r => r.rem === i).length;
+      const it = el("button", "item");
+      const label = rem.canonical_name || rem.name || "";
+      it.innerHTML = `<span>${esc(label)}<br><small style="color:var(--muted)">${esc(rem.abbrev || "")}</small></span><em>${fmt(n)}</em>`;
+      it.setAttribute("aria-current", String(S.remedy === i));
+      it.onclick = () => showRemedy(i);
+      rail.append(it);
+    });
+    return;
+  }
+
   const chapters = S.book.chapters
     || (S.sectionsMeta.length > 1
         ? S.sectionsMeta.map((m, i) => ({ title: m.title, sec: i, rubrics: m.count }))
@@ -521,11 +559,51 @@ function renderChapter() {
   v.innerHTML = "";
   v.scrollTop = 0;
   const head = el("div", "chapter-head");
-  const secTitle = S.chapter?.title || S.book.title;
-  head.innerHTML = `
-    <div class="kicker">${esc(S.book.author || "")} · ${S.book.year || ""}</div>
-    <h1>${esc(secTitle)}</h1>
-    <p>${fmt(viewRows.length)} ${viewRows.length === 1 ? "rubric" : "rubrics"}${S.filterRemedy ? ` containing <b>${esc(S.filterRemedy)}</b>` : ""}${S.query ? ` matching “${esc(S.query)}”` : ""}.</p>`;
+  if (S.mm) {
+    const rem = S.mm[S.remedy] || {};
+    const nSym = viewRows.filter(r => !r.head).length;
+    const inds = (rem.clinical_indications || []).filter(Boolean);
+    const sec = rem.sections || {};
+    const rel = (sec.relationships || []).filter(x => x && (x.remedies || []).length);
+    const ant = (sec.antidotes || []).filter(Boolean);
+    const dos = (sec.dosages || []).filter(Boolean);
+    const shown = rem.canonical_name || rem.name || "";
+    const printed = (rem.name || "").trim();
+    const facts = [
+      (rem.canonical_name && printed && rem.canonical_name.toLowerCase() !== printed.toLowerCase())
+        ? `<span>printed as <b>${esc(printed)}</b></span>` : "",
+      rem.common_name ? `<span><b>${esc(rem.common_name)}</b> common name</span>` : "",
+      rem.kingdom ? `<span><b>${esc(rem.kingdom)}</b> kingdom</span>` : "",
+      rem.family ? `<span><b>${esc(rem.family)}</b> family</span>` : "",
+      `<span><b>${fmt(nSym)}</b> symptoms</span>`
+    ].filter(Boolean).join("");
+    head.innerHTML = `
+      <div class="kicker">${esc(S.book.author || "")} · ${S.book.year || ""}</div>
+      <div class="portrait">
+        <div class="abbr">${esc(rem.abbrev || "")}</div>
+        <h2>${esc(shown || S.chapter?.title || "Remedy")}</h2>
+        <div class="facts">${facts}</div>
+        ${inds.length ? `<h4>Clinical indications</h4><div class="ind">${inds.map(i =>
+            `<button class="chip" data-ind="${esc(i)}">${esc(i)}</button>`).join("")}</div>` : ""}
+        ${rel.length ? `<h4>Relationships</h4><div class="ind">${rel.map(x =>
+            `<span class="chip" title="${esc(x.kind || "")}">${esc((x.kind || "related") + ": " + (x.remedies || []).join(", "))}</span>`).join("")}</div>` : ""}
+        ${ant.length ? `<h4>Antidotes</h4><div class="ind">${ant.map(a =>
+            `<span class="chip">${esc(typeof a === "string" ? a : JSON.stringify(a))}</span>`).join("")}</div>` : ""}
+        ${dos.length ? `<h4>Dosage</h4><div class="ind">${dos.map(d =>
+            `<span class="chip">${esc(typeof d === "string" ? d : JSON.stringify(d))}</span>`).join("")}</div>` : ""}
+      </div>`;
+    head.querySelectorAll("[data-ind]").forEach(b => b.onclick = () => {
+      S.query = b.dataset.ind.toLowerCase();
+      viewRows = S.rubrics.filter(r => r.rem === S.remedy && r.t.toLowerCase().includes(S.query));
+      renderChapter();
+    });
+  } else {
+    const secTitle = S.chapter?.title || S.book.title;
+    head.innerHTML = `
+      <div class="kicker">${esc(S.book.author || "")} · ${S.book.year || ""}</div>
+      <h1>${esc(secTitle)}</h1>
+      <p>${fmt(viewRows.length)} ${viewRows.length === 1 ? "rubric" : "rubrics"}${S.filterRemedy ? ` containing <b>${esc(S.filterRemedy)}</b>` : ""}${S.query ? ` matching “${esc(S.query)}”` : ""}.</p>`;
+  }
   v.append(head);
 
   const rows = el("div", "rows");
@@ -559,6 +637,7 @@ function renderMore(rows) {
 }
 
 function rubricNode(r, i) {
+  if (r.head) return el("div", "chapt", r.head);
   const n = el("div", "rub");
   const txt = el("div", "txt");
   if (r.p) txt.append(el("span", "parent", r.p + ", "));
@@ -574,6 +653,12 @@ function rubricNode(r, i) {
     c.append(document.createTextNode(x.a));
     c.onclick = () => filterByRemedy(x.a);
     rems.append(c);
+  }
+  if (r.mods && r.mods.length) {
+    const m = el("div", "mod");
+    m.innerHTML = r.mods.slice(0, 4).map(x =>
+      `<i>${esc(x.dir === "worse" ? "worse" : x.dir === "better" ? "better" : "&nbsp;")}</i> ${esc(x.text || "")}`).join(" · ");
+    txt.append(m);
   }
   n.append(rems);
   const num = el("div", "num", String(i + 1));
@@ -601,12 +686,16 @@ async function openChapter(c, { push = false } = {}) {
     const rubrics = normalise(data);
     resolveTable(data, rubrics);
     S.rubrics = rubrics;
+    S.mm = data.type === "materia_medica" ? (data.remedies || []) : null;
     const secs = data.section ? [data.section] : (data.sections || []);
     S.sectionsMeta = secs.map(x => ({ title: x.title || "General", count: (x.rubrics || []).length }));
     S.activeSection = secs.length > 1 ? 0 : null;
-    if (secs.length > 1) viewRows = rubrics.filter(r => r.sec === 0);
+    if (S.mm) {
+      S.remedy = 0;
+      viewRows = mmRows(0);
+    } else if (secs.length > 1) viewRows = rubrics.filter(r => r.sec === 0);
     S.loaded.set(c.file, rubrics);
-    viewRows = rubrics;
+    if (!S.mm && secs.length <= 1) viewRows = rubrics;   // else it is set above
     renderRail("chapters");     // the payload's sections are known only now
     renderChapter();
     document.title = `${c.title} — ${S.book.title}`;
@@ -615,6 +704,28 @@ async function openChapter(c, { push = false } = {}) {
     v.innerHTML = `<div class="empty">This chapter could not be loaded.<br><small>${esc(String(e.message || e))}</small><br><br>
       <button class="chip" onclick="location.reload()">Try again</button></div>`;
   }
+}
+
+function mmRows(ri) {
+  const rows = [];
+  let last = null;
+  for (const r of S.rubrics) {
+    if (r.rem !== ri) continue;
+    if (r.ch !== last) { rows.push({ head: r.ch }); last = r.ch; }
+    rows.push(r);
+  }
+  return rows;
+}
+
+function showRemedy(ri) {
+  S.remedy = ri;
+  S.query = ""; S.filterRemedy = null;
+  viewRows = mmRows(ri);
+  const rem = S.mm?.[ri];
+  S.chapter = { title: rem?.name || "Remedy", file: S.chapter?.file };
+  renderRail("chapters");
+  renderChapter();
+  history.replaceState({ book: S.book.id, chapter: S.chapter.file, remedy: ri }, "");
 }
 
 function showSection(i, title) {
@@ -667,6 +778,13 @@ const Pal = {
       if (i < 0) return;
       hits.push({ r, where, book, i, q });
     };
+    if (S.mm) {
+      // in a materia medica the remedy name is the way in
+      S.mm.forEach((rem, ri) => {
+        const nm = ((rem.canonical_name || "") + " " + (rem.name || "") + " " + (rem.abbrev || "")).toLowerCase();
+        if (nm.includes(q)) for (const r of S.rubrics) if (r.rem === ri && hits.length < 300) hits.push({ r, where: rem.canonical_name || rem.name, book: S.book, i: -1, q });
+      });
+    }
     if (Pal.scope === "chapter" && S.rubrics.length) {
       for (const r of S.rubrics) { if (hits.length > 400) break; push(r, S.chapter?.title || "", S.book); }
     } else {

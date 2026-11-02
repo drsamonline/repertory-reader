@@ -1,5 +1,25 @@
 # Changelog
 
+## 1.1.0 — 2026-11-02
+
+**The materia medicas are readable now.** They were being flattened like a
+repertory — symptoms with no remedy attached, which is useless: a materia medica
+*is* remedy → symptoms. A materia medica now opens as:
+
+- **a remedy rail** — every remedy in the volume, with its abbreviation and
+  symptom count, instead of a single "whole book" entry;
+- **a remedy portrait** — canonical name (where the extraction resolved one),
+  the printed name beneath it when they differ, abbreviation, and the clinical
+  indications as clickable chips that filter that remedy's symptoms;
+- **symptoms grouped by their printed chapter** — "Skin", "Stools",
+  "Aggravation" — with modality lines where the source carries them;
+- **search by remedy name**, so "nux" or "acon" finds the remedy as well as its
+  text.
+
+Bell's *Therapeutics* (103 remedies) and both parts of Jahr's *Manual* (199
+remedies) now read as books of remedies rather than anonymous lists.
+
+
 ## 1.0.0 — 2026-11-02
 
 First release.
