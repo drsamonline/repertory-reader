@@ -175,6 +175,7 @@ aside.rail{border-right:1px solid var(--rule);overflow:auto;padding:14px 0 40px;
 .book .yr{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.06em}
 .book h3{font-family:var(--serif);font-size:19px;line-height:1.22;margin:0;font-weight:600}
 .book .au{font-size:12.5px;color:var(--muted);margin-top:-4px}
+.book .range{font-size:11.5px;color:var(--accent);font-family:var(--mono);letter-spacing:.01em;margin-top:-2px}
 .book .meta{margin-top:auto;display:flex;gap:12px;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
 .book .meta b{color:var(--ink);font-weight:600}
 .tag{position:absolute;right:14px;top:14px;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);padding:2px 6px;border-radius:2px}
@@ -466,9 +467,10 @@ function renderLibrary() {
     const links = b.counts?.remedy_links ?? b.counts?.remedies ?? 0;
     card.innerHTML = `
       <span class="tag">${b.type === "materia_medica" ? "materia medica" : "repertory"}</span>
-      <span class="yr">${b.year || ""}${b.parts ? ` · part ${b.part}/${b.parts}` : ""}</span>
+      <span class="yr">${b.year || ""}${b.parts ? ` · file ${b.part} of ${b.parts}` : ""}</span>
       <h3>${esc(b.title)}</h3>
       <span class="au">${esc(b.author || "")}</span>
+      ${b.part_range ? `<span class="range">${esc(b.part_range)}</span>` : ""}
       <span class="meta"><span><b>${fmt(n)}</b> ${b.type === "materia_medica" ? "symptoms" : "rubrics"}</span>
       <span><b>${fmt(links)}</b> ${b.type === "materia_medica" ? "remedies" : "links"}</span>
       ${b.chapters ? `<span><b>${b.chapters.length}</b> ch.</span>` : ""}</span>`;
@@ -578,7 +580,7 @@ function renderChapter() {
       `<span><b>${fmt(nSym)}</b> symptoms</span>`
     ].filter(Boolean).join("");
     head.innerHTML = `
-      <div class="kicker">${esc(S.book.author || "")} · ${S.book.year || ""}</div>
+      <div class="kicker">${esc(S.book.author || "")} · ${S.book.year || ""}${S.book.parts ? ` · file ${S.book.part} of ${S.book.parts}` : ""}</div>
       <div class="portrait">
         <div class="abbr">${esc(rem.abbrev || "")}</div>
         <h2>${esc(shown || S.chapter?.title || "Remedy")}</h2>
