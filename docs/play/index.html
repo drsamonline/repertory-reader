@@ -614,7 +614,7 @@ function normalise(data) {
     (data.sections || []).forEach((x) => {
       out.push({
         t: x.text || "", p: null, rems: [], ch: "General", sec: 0,
-        n: x.n, notes: x.notes || [], treatise: true
+        n: x.n, title: x.title || null, notes: x.notes || [], treatise: true
       });
     });
     return out;
@@ -783,7 +783,9 @@ function coverNode(b) {
       <span class="a">${esc(b.author || "")}</span>
     </span>
     <span class="cap"><span><b>${fmt(n)}</b> ${
-      b.type === "materia_medica" ? "symptoms" : b.type === "treatise" ? "paragraphs" : "rubrics"}</span>
+      b.type === "materia_medica" ? "symptoms"
+        : b.type === "treatise" ? (b.counts?.words != null ? "chapters" : "paragraphs")
+        : "rubrics"}</span>
       <span>${
       b.type === "materia_medica" ? "materia medica" : b.type === "treatise" ? "treatise" : "repertory"}</span></span>`;
   el2.onclick = () => openBook(b);
@@ -1048,6 +1050,11 @@ function rubricNode(r, i) {
   if (r.treatise) {
     const para = el("div", "rub");
     const body = el("div", "txt");
+    if (r.title) {
+      const h = el("div", "chapt");
+      h.textContent = r.title;
+      body.append(h);
+    }
     body.append(document.createTextNode(r.t));
     if (r.notes && r.notes.length) {
       const nt = el("div", "mod");
@@ -1055,7 +1062,8 @@ function rubricNode(r, i) {
       body.append(nt);
     }
     para.append(body);
-    para.append(el("div", "num", "§" + r.n));
+    // a numbered treatise (the Organon) shows its §, a chaptered one shows no number
+    para.append(el("div", "num", r.title ? "" : "§" + r.n));
     return para;
   }
   const n = el("div", "rub");

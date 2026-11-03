@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.0 — 2026-11-03
+
+- **Chaptered treatises.** A treatise section may now carry a `title` instead of a
+  paragraph number, for the volumes that are chapters of prose rather than numbered
+  aphorisms: Allen's two *Chronic Miasms* volumes and Bradford's *Life and Letters*.
+  `normalise()` carries the title through and the reader prints it as a heading, with no
+  § against it — a numbered treatise like the Organon is unchanged and still shows §.
+- **The shelf says what it holds.** A treatise cover counts "paragraphs" when the volume
+  is numbered and "chapters" when it is chaptered, instead of calling both rubrics.
+- The library now carries 24 books in 23 volumes; the volume badge and the README were
+  both stale at 19.
 ## 1.9.0 — 2026-11-03
 
 - **Treatises.** The library gained a third kind of book: a prose work with numbered

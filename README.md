@@ -1,14 +1,14 @@
 # The Repertory Desk
 
 [![0 dependencies](docs/assets/badge-tests.svg)](docs/play/index.html)
-[![19 volumes](docs/assets/badge-deps.svg)](docs/play/index.html)
+[![23 volumes](docs/assets/badge-deps.svg)](docs/play/index.html)
 [![offline yes](docs/assets/badge-offline.svg)](docs/play/index.html)
 [![CC0 1.0](docs/assets/badge-licence.svg)](LICENSE)
 
-**A quiet reading room for seventeen classical homoeopathic repertories and the
-Organon in both of its English editions** — 271,421 rubrics, 744,394 graded remedy
-links and 585 numbered paragraphs, read straight from the open JSON library on
-GitHub. No account, no server, no tracking, no build step.
+**A quiet reading room for seventeen classical homoeopathic repertories and five
+public-domain treatises** — 271,421 rubrics, 744,394 graded remedy links and 703
+sections of prose, read straight from the open JSON library on GitHub. No account,
+no server, no tracking, no build step.
 
 **Live:** <https://drsamonline.github.io/repertory-reader/> &nbsp;·&nbsp;
 **The reader:** <https://drsamonline.github.io/repertory-reader/play/> &nbsp;·&nbsp;
@@ -16,14 +16,17 @@ GitHub. No account, no server, no tracking, no build step.
 
 ![The Repertory Desk](docs/assets/app-desktop.png)
 
-## The Organon, in two editions
+## The treatises
 
-The library also carries the *Organon of Medicine* as a **treatise**: numbered
-paragraphs, no rubrics, no remedies. Both public-domain English translations are here,
-as separate volumes that are never merged —
+The library also carries prose works as a **treatise**: no rubrics, no remedies. A
+numbered treatise (the Organon) shows a § against each paragraph; a chaptered one shows
+its chapter title instead. Each is a separate volume and none is merged with another —
 
-- **sixth edition**, Boericke 1922 — 291 paragraphs
-- **fifth edition**, Dudgeon 1849 — 294 paragraphs
+- **Organon, sixth edition**, Boericke 1922 — 291 paragraphs
+- **Organon, fifth edition**, Dudgeon 1849 — 294 paragraphs
+- **Allen, The Chronic Miasms — Psora and Pseudo-Psora**, 1908 — 25 chapters
+- **Allen, The Chronic Miasms — Sycosis**, 1908 — 23 chapters
+- **Bradford, The Life and Letters of Dr. Samuel Hahnemann**, 1894 — 70 chapters
 
 They are different books: 74 paragraphs are worded differently and §292–§294 exist only
 in the fifth. Each paragraph carries the source it was read from and the fraction of its
