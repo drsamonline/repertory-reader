@@ -768,7 +768,8 @@ function coverNode(b) {
   el2.style.setProperty("--c-ink", c.ink);
   const initials = (b.title || "").replace(/[^A-Za-z ]/g, "").split(/\s+/).filter(Boolean)
     .slice(0, 2).map(w => w[0].toUpperCase()).join("");
-  const flag = b.quality ? `<span class="warn">${b.quality === "damaged" ? "damaged scan" : "partial scan"}</span>` : "";
+  const flag = b.quality ? `<span class="warn">${b.quality === "damaged" ? "damaged scan" : "partial scan"}</span>`
+    : b.rights_note ? `<span class="warn">rights vary by country</span>` : "";
   if (b.quality) el2.classList.add("is-damaged");
   el2.title = b.quality_note || "";
   el2.innerHTML = `
@@ -930,6 +931,12 @@ function renderChapter() {
     v.append(bar);
   }
   const head = el("div", "chapter-head");
+  if (S.book && S.book.rights_note) {
+    const rn = el("div", "banner-r");
+    rn.textContent = "Rights: " + S.book.rights_note + ".";
+    rn.style.cssText = "border:1px solid #4a3a1a;background:#1d1810;color:#e7d7b3;border-radius:8px;padding:8px 10px;font-size:13px;margin:0 0 12px";
+    head.append(rn);
+  }
   if (S.mm) {
     const rem = S.mm[S.remedy] || {};
     const nSym = viewRows.filter(r => !r.head).length;
