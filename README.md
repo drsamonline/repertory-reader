@@ -1,19 +1,34 @@
 # The Repertory Desk
 
 [![0 dependencies](docs/assets/badge-tests.svg)](docs/play/index.html)
-[![17 volumes](docs/assets/badge-deps.svg)](docs/play/index.html)
+[![19 volumes](docs/assets/badge-deps.svg)](docs/play/index.html)
 [![offline yes](docs/assets/badge-offline.svg)](docs/play/index.html)
 [![CC0 1.0](docs/assets/badge-licence.svg)](LICENSE)
 
-**A quiet reading room for seventeen classical homoeopathic repertories** —
-271,421 rubrics and 744,394 graded remedy links, read straight from the open JSON
-library on GitHub. No account, no server, no tracking, no build step.
+**A quiet reading room for seventeen classical homoeopathic repertories and the
+Organon in both of its English editions** — 271,421 rubrics, 744,394 graded remedy
+links and 585 numbered paragraphs, read straight from the open JSON library on
+GitHub. No account, no server, no tracking, no build step.
 
 **Live:** <https://drsamonline.github.io/repertory-reader/> &nbsp;·&nbsp;
 **The reader:** <https://drsamonline.github.io/repertory-reader/play/> &nbsp;·&nbsp;
 **The library:** <https://github.com/drsamonline/homoeopathic-materia-medica-repertory-json>
 
 ![The Repertory Desk](docs/assets/app-desktop.png)
+
+## The Organon, in two editions
+
+The library also carries the *Organon of Medicine* as a **treatise**: numbered
+paragraphs, no rubrics, no remedies. Both public-domain English translations are here,
+as separate volumes that are never merged —
+
+- **sixth edition**, Boericke 1922 — 291 paragraphs
+- **fifth edition**, Dudgeon 1849 — 294 paragraphs
+
+They are different books: 74 paragraphs are worded differently and §292–§294 exist only
+in the fifth. Each paragraph carries the source it was read from and the fraction of its
+12-letter sequences found verbatim in OCR scans of that same edition, so you can see for
+yourself that a paragraph is the book's text and not a reconstruction.
 
 ## What it is
 

@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.9.0 — 2026-11-03
+
+- **Treatises.** The library gained a third kind of book: a prose work with numbered
+  paragraphs. `type: "treatise"` is normalised into the same row shape as a rubric —
+  one row per paragraph, no parent, no remedy chips — so search, the reading rail and
+  paging work on it without a second code path.
+- **The Organon, both editions.** The sixth (Boericke 1922, 291 paragraphs) and the fifth
+  (Dudgeon 1849, 294 paragraphs) are separate volumes in the library, shown with the
+  right noun on their covers ("paragraphs", "treatise") rather than "rubrics".
+- A paragraph prints its own number and its printed footnotes under it; nothing is
+  invented to fill a gap.
 ## 1.8.0 — 2026-11-02
 
 - The damage banner now prints the measured figures behind its flag — duplicate

@@ -597,6 +597,7 @@ const S = {
   loaded: new Map(),   // path -> rubrics[]  (whole-book search)
   sectionsMeta: [],    // the payload's own sections, for single-file books
   mm: null,            // remedies, when the volume is a materia medica
+  treatise: null,      // paragraphs, when the volume is a treatise
   remedy: null,        // the open remedy index in that volume
   activeSection: null,
   theme: localStorage.getItem(LS + "theme") || "paper",
@@ -606,6 +607,18 @@ const S = {
 /* ── normalise a book payload into one flat rubric array ────────────────── */
 function normalise(data) {
   const out = [];
+  if (data.type === "treatise") {
+    // a treatise is numbered paragraphs, not rubrics: no parent, no remedy chips.
+    // `ch` stays General because the book has no chapters, and `sec` is 0 so the
+    // existing single-section path in openChapter keeps working unchanged.
+    (data.sections || []).forEach((x) => {
+      out.push({
+        t: x.text || "", p: null, rems: [], ch: "General", sec: 0,
+        n: x.n, notes: x.notes || [], treatise: true
+      });
+    });
+    return out;
+  }
   if (data.type === "materia_medica") {
     // a materia medica is remedy -> symptoms, so every row remembers which
     // remedy it belongs to and which labelled group of that remedy it sits in
@@ -748,7 +761,7 @@ function coverOf(b) {
 
 function coverNode(b) {
   const c = coverOf(b);
-  const n = b.counts?.rubrics ?? b.counts?.symptoms ?? 0;
+  const n = b.counts?.rubrics ?? b.counts?.symptoms ?? b.counts?.sections ?? 0;
   const el2 = el("button", "cover");
   el2.style.setProperty("--c1", c.c1);
   el2.style.setProperty("--c2", c.c2);
@@ -769,8 +782,10 @@ function coverNode(b) {
       <span class="rule"></span>
       <span class="a">${esc(b.author || "")}</span>
     </span>
-    <span class="cap"><span><b>${fmt(n)}</b> ${b.type === "materia_medica" ? "symptoms" : "rubrics"}</span>
-      <span>${b.type === "materia_medica" ? "materia medica" : "repertory"}</span></span>`;
+    <span class="cap"><span><b>${fmt(n)}</b> ${
+      b.type === "materia_medica" ? "symptoms" : b.type === "treatise" ? "paragraphs" : "rubrics"}</span>
+      <span>${
+      b.type === "materia_medica" ? "materia medica" : b.type === "treatise" ? "treatise" : "repertory"}</span></span>`;
   el2.onclick = () => openBook(b);
   return el2;
 }
@@ -1030,6 +1045,19 @@ function renderMore(rows) {
 
 function rubricNode(r, i) {
   if (r.head) return el("div", "chapt", r.head);
+  if (r.treatise) {
+    const para = el("div", "rub");
+    const body = el("div", "txt");
+    body.append(document.createTextNode(r.t));
+    if (r.notes && r.notes.length) {
+      const nt = el("div", "mod");
+      nt.innerHTML = r.notes.map(x => `<span>${esc(x)}</span>`).join("<br>");
+      body.append(nt);
+    }
+    para.append(body);
+    para.append(el("div", "num", "§" + r.n));
+    return para;
+  }
   const n = el("div", "rub");
   const txt = el("div", "txt");
   if (r.p) txt.append(el("span", "parent", r.p + ", "));
@@ -1081,6 +1109,7 @@ async function openChapter(c, { push = false } = {}) {
     resolveTable(data, rubrics);
     S.rubrics = rubrics;
     S.mm = data.type === "materia_medica" ? (data.remedies || []) : null;
+    S.treatise = data.type === "treatise" ? (data.sections || []) : null;
     const secs = data.section ? [data.section] : (data.sections || []);
     S.sectionsMeta = secs.map(x => ({ title: x.title || "General", count: (x.rubrics || []).length }));
     S.activeSection = secs.length > 1 ? 0 : null;
@@ -1094,7 +1123,8 @@ async function openChapter(c, { push = false } = {}) {
       const oldest = S.loaded.keys().next().value;
       if (oldest !== c.file) { S.loaded.delete(oldest); idxCache.delete(oldest); }
     }
-    if (!S.mm && secs.length <= 1) viewRows = rubrics;   // else it is set above
+    if (S.treatise) viewRows = rubrics;                  // every paragraph, in order
+    else if (!S.mm && secs.length <= 1) viewRows = rubrics;   // else it is set above
     renderRail("chapters");     // the payload's sections are known only now
     renderChapter();
     $("#crumb").textContent = S.book.title.length > 34 ? S.book.title.slice(0, 34) + "…" : S.book.title;
