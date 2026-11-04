@@ -6,8 +6,8 @@
 [![CC0 1.0](docs/assets/badge-licence.svg)](LICENSE)
 
 **A quiet reading room for sixteen classical homoeopathic repertories, six materia
-medicas and thirty-three public-domain treatises** — 307,998 rubrics, 1,359,069 remedy
-links (751,907 of them graded) and 5,375 sections of prose, read straight from the open
+medicas and thirty-three public-domain treatises** — 343,014 rubrics, 1,392,696 remedy
+links (751,907 of them graded) and 5,392 sections of prose, read straight from the open
 JSON library on GitHub. No account,
 no server, no tracking, no build step.
 
