@@ -1,13 +1,13 @@
 # The Repertory Desk
 
 [![0 dependencies](docs/assets/badge-tests.svg)](docs/play/index.html)
-[![54 volumes](docs/assets/badge-deps.svg)](docs/play/index.html)
+[![55 volumes](docs/assets/badge-deps.svg)](docs/play/index.html)
 [![offline yes](docs/assets/badge-offline.svg)](docs/play/index.html)
 [![CC0 1.0](docs/assets/badge-licence.svg)](LICENSE)
 
 **A quiet reading room for sixteen classical homoeopathic repertories, six materia
-medicas and thirty-two public-domain treatises** — 307,998 rubrics, 1,359,069 remedy
-links (751,907 of them graded) and 5,325 sections of prose, read straight from the open
+medicas and thirty-three public-domain treatises** — 307,998 rubrics, 1,359,069 remedy
+links (751,907 of them graded) and 5,375 sections of prose, read straight from the open
 JSON library on GitHub. No account,
 no server, no tracking, no build step.
 
@@ -35,6 +35,7 @@ Thirty-two treatises, from the two Organons to Clarke's *Dictionary* in three vo
 - **G. H. G. Jahr**, *The Venereal Diseases, Their Pathological Nature, Diagnosis and Treatment* (1868) — 230 sections
 - **G. H. G. Jahr; A. Possart**, *Jahr's and Possart's New Manual of the Homoeopathic Materia Medica* (1853) — 409 sections
 - **H. C. Allen**, *Keynotes and Characteristics with Comparisons of Some of the Leading Remedies of the Materia Medica* (1916) — 183 sections
+- **B. L. Hill**, *An Epitome of the Homeopathic Healing Art* (1861) — 50 sections
 - **Henry Newell Guernsey**, *The Application of the Principles and Practice of Homoeopathy to Obstetrics* (1866) — 77 sections
 - **J. H. Pulte**, *The Homoeopathic Domestic Physician* (1855) — 223 sections
 - **J. Henry Allen**, *The Chronic Miasms — Sycosis* (1908) — 23 sections
