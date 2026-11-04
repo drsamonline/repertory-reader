@@ -141,9 +141,10 @@ footer .stamp{margin-left:auto;font-family:var(--mono);font-size:11px;opacity:.7
 <div class="wrap hero">
   <div class="kicker">A reading room, not a search engine</div>
   <h1>Sixteen repertories, read the way they were <em>printed</em>.</h1>
-  <p class="lede">307,998 rubrics and 1,359,069 remedy links — 751,907 of them carrying a grade the
-    book itself printed — from sixteen repertories, six materia medicas and thirty-two
-    treatises, set in a reader that stays out of the way. It reads the open JSON library straight from GitHub; nothing is uploaded,
+  <p class="lede"><span id="ledeRubrics">307,998</span> rubrics and <span id="ledeLinks">1,359,069</span>
+    remedy links — <span id="ledeGraded">751,907</span> of them carrying a grade the book itself
+    printed — from <span id="ledeCounts">sixteen repertories, six materia medicas and thirty-two treatises</span>,
+    set in a reader that stays out of the way. It reads the open JSON library straight from GitHub; nothing is uploaded,
     nothing is ranked, nothing is invented.</p>
   <div class="cta">
     <a class="btn primary" href="play/">Open the reader →</a>
@@ -156,9 +157,9 @@ footer .stamp{margin-left:auto;font-family:var(--mono);font-size:11px;opacity:.7
     <img src="assets/badge-licence.svg" alt="CC0 1.0">
   </div>
   <div class="stats">
-    <div><b>307,998</b><span>rubrics</span></div>
-    <div><b>1,359,069</b><span>remedy links</span></div>
-    <div><b>54</b><span>volumes, 1847–1922</span></div>
+    <div><b id="statRubrics">307,998</b><span>rubrics</span></div>
+    <div><b id="statLinks">1,359,069</b><span>remedy links</span></div>
+    <div><b id="statVolumes">54</b><span id="statYears">volumes, 1847–1932</span></div>
     <div><b>0</b><span>accounts, cookies, trackers</span></div>
   </div>
 </div>
@@ -444,6 +445,69 @@ if (location.protocol.startsWith("http") && "IntersectionObserver" in window) {
   }, { rootMargin: "200px" });
   io.observe(document.getElementById("screen"));
 }
+</script>
+
+<script>
+/* The page reads the library it describes, so its figures cannot drift from the shelf.
+   Everything below is a static fallback: if the fetch fails or JS is off, the page still
+   shows the last known figures rather than nothing. */
+(async () => {
+  const RAW = "https://raw.githubusercontent.com/drsamonline/homoeopathic-materia-medica-repertory-json/main/catalog.json";
+  try {
+    const r = await fetch(RAW, { cache: "no-cache" });
+    if (!r.ok) return;
+    const c = await r.json();
+    const t = c.totals || {}, books = Array.isArray(c.books) ? c.books : [];
+    const fmt = n => Number(n || 0).toLocaleString("en-US");
+    const set = (id, v) => { const el = document.getElementById(id); if (el && v != null) el.textContent = v; };
+
+    set("ledeRubrics", fmt(t.repertory_rubrics));
+    set("ledeLinks", fmt(t.remedy_links));
+    set("ledeGraded", fmt(t.graded_links));
+    set("statRubrics", fmt(t.repertory_rubrics));
+    set("statLinks", fmt(t.remedy_links));
+
+    const ones = ["zero","one","two","three","four","five","six","seven","eight","nine","ten",
+      "eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];
+    const tens = ["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
+    const spelled = n => {
+      if (n < 20) return ones[n];
+      if (n < 100) { const t = Math.floor(n / 10), o = n % 10; return tens[t] + (o ? "-" + ones[o] : ""); }
+      return fmt(n);
+    };
+    const byType = ty => books.filter(b => b.type === ty).length;
+    if (books.length) {
+      const rp = byType("repertory"), mm = byType("materia_medica"), tr = byType("treatise");
+      const plural = (n, one, many) => n === 1 ? one : many;
+      set("ledeCounts", `${spelled(rp)} ${plural(rp,"repertory","repertories")}, ${spelled(mm)} ${plural(mm,"materia medica","materia medicas")} and ${spelled(tr)} ${plural(tr,"treatise","treatises")}`);
+      set("statVolumes", String(books.length));
+      const years = books.map(b => b.year).filter(Boolean);
+      if (years.length) set("statYears", `volumes, ${Math.min(...years)}–${Math.max(...years)}`);
+    }
+
+    const list = document.getElementById("sourceList");
+    if (!list || !books.length) return;
+    const order = { repertory: 0, materia_medica: 1, treatise: 2 };
+    const weight = b => (b.counts && (b.counts.rubrics || b.counts.remedies || b.counts.sections)) || 0;
+    const label = b => {
+      const a = String(b.author || "").split(";")[0].split(",")[0].trim();
+      return `${a} — ${b.title} (${b.year})`;
+    };
+    const count = b => b.type === "repertory" ? fmt(b.counts.rubrics)
+                   : b.type === "materia_medica" ? `${b.counts.remedies} rem.`
+                   : `${b.counts.sections} sec.`;
+    const rows = books.slice().sort((x, y) =>
+      (order[x.type] - order[y.type]) || (weight(y) - weight(x)));
+    list.replaceChildren(...rows.map(b => {
+      const d = document.createElement("div"); d.className = "src";
+      const a = document.createElement("span"); a.textContent = label(b);
+      const n = document.createElement("span"); n.textContent = count(b);
+      d.append(a, n); return d;
+    }));
+  } catch (e) {
+    /* keep the static fallback */
+  }
+})();
 </script>
 </body>
 </html>

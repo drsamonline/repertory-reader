@@ -3,7 +3,7 @@
 ## 2.1.0 — 2026-11-04
 
 - **The shelf grew to 54 volumes.** Thirty-two treatises now, sixteen repertories and six
-  materia medicas, spanning 1847–1922: Clarke's *Dictionary* complete in three volumes,
+  materia medicas, spanning 1847–1932: Clarke's *Dictionary* complete in three volumes,
   Hering's *Guiding Symptoms*, Allen's *Keynotes*, Dewey, Lilienthal, Jahr, Guernsey,
   Duncan, Kippax, Pulte, Tarbell, Ruddock, Laurie, Humphreys and the rest.
 - **The figures were recounted, not incremented.** Every split volume had been missing
