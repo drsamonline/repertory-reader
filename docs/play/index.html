@@ -618,6 +618,19 @@ const S = {
 };
 
 /* ── normalise a book payload into one flat rubric array ────────────────── */
+// split prose into paragraph-sized pieces at sentence ends, never mid-sentence
+function paragraphs(text) {
+  const t = String(text || "").replace(/\s+/g, " ").trim();
+  if (!t) return [];
+  if (t.length <= 700) return [t];
+  const out = []; let cur = "";
+  for (const sentence of t.split(/(?<=\.)\s+/)) {
+    if (cur && (cur + " " + sentence).length > 700) { out.push(cur); cur = sentence; }
+    else cur = cur ? cur + " " + sentence : sentence;
+  }
+  if (cur) out.push(cur);
+  return out;
+}
 function normalise(data) {
   const out = [];
   if (data.type === "treatise") {
@@ -638,11 +651,13 @@ function normalise(data) {
     (data.remedies || []).forEach((rem, ri) => {
       const syms = rem.symptoms || [];
       if (syms.length) {
-        for (const s of syms)
-          out.push({
-            t: s.text || "", p: null, rems: [], rem: ri,
-            ch: s.chapter || "General", mods: s.modalities || []
-          });
+        for (const s of syms) {
+          const parts = paragraphs(s.text);
+          parts.forEach((t, pi) => out.push({
+            t, p: null, rems: [], rem: ri,
+            ch: s.chapter || "General", mods: pi === 0 ? (s.modalities || []) : []
+          }));
+        }
         return;
       }
       // Some volumes were transcribed as prose and carry their text in
@@ -650,7 +665,11 @@ function normalise(data) {
       // the same as an empty book, so the prose is shown as one block.
       const secs = rem.sections || {};
       const text = secs.general || Object.values(secs).filter(Boolean).join("\n\n");
-      if (text) out.push({ t: text, p: null, rems: [], rem: ri, ch: "General", mods: [] });
+      // A monograph transcribed as one string reads as an unbroken wall. Break it at
+      // sentence ends into paragraph-sized rows so it can be read; the words are the
+      // book's own and nothing is added.
+      for (const para of paragraphs(text))
+        out.push({ t: para, p: null, rems: [], rem: ri, ch: "General", mods: [] });
     });
     return out;
   }
