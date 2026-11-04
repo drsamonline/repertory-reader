@@ -546,10 +546,16 @@ function buildIndex(path, rubrics) {
 const inflight = new Map();
 
 async function load(path, { refresh = false } = {}) {
-  if (!refresh && mem.has(path)) return mem.get(path);
+  /* The catalogue is the shelf itself. It must never be answered from a local cache:
+     a reader who came yesterday would see the library as it was up to a week ago,
+     with no sign that it is old. Chapters are immutable once published, so they keep
+     the cache-first path; the catalogue always goes to the network, and the cached
+     copy is used only when the network fails. */
+  const isCatalog = path.endsWith("catalog.json");
+  if (!refresh && !isCatalog && mem.has(path)) return mem.get(path);
   if (inflight.has(path)) return inflight.get(path);
   const job = (async () => {
-    if (!refresh) {
+    if (!refresh && !isCatalog) {
       const hit = await Store.get(path);
       if (hit && Date.now() - hit.ts < 7 * 864e5) {
         try { const d = JSON.parse(hit.body); mem.set(path, d); revalidate(path); return d; }
@@ -568,7 +574,14 @@ async function load(path, { refresh = false } = {}) {
         text = await r.text(); err = null; break;
       } catch (e) { err = e; }
     }
-    if (text == null) throw err || new Error("offline");
+    if (text == null) {
+      // offline: a cached shelf is better than an empty one, but only as a last resort
+      if (isCatalog) {
+        const hit = await Store.get(path);
+        if (hit) { try { const d = JSON.parse(hit.body); mem.set(path, d); return d; } catch { /* fall through */ } }
+      }
+      throw err || new Error("offline");
+    }
     const data = JSON.parse(text);
     mem.set(path, data);
     Store.put(path, text);

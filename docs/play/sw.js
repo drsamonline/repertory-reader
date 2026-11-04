@@ -1,8 +1,10 @@
 /* The Repertory Desk — service worker.
-   HTML is network-first so a release is never hidden behind a stale cache;
-   the library JSON is cache-first with a background refresh, which is what
-   makes a second visit work with no connection at all. */
-const CACHE = "repertory-desk-v1.8.0-2026-11-02";
+   HTML is network-first so a release is never hidden behind a stale cache.
+   catalog.json is network-first too: it is the shelf, and a reader who came
+   yesterday must not be shown the library as it was a week ago. Chapters are
+   immutable once published, so they stay cache-first with a background
+   refresh — that is what makes a second visit work with no connection. */
+const CACHE = "repertory-desk-v2.1.0-2026-11-04";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icon.svg"];
 
 self.addEventListener("install", e => {
