@@ -636,15 +636,27 @@ function normalise(data) {
     // a materia medica is remedy -> symptoms, so every row remembers which
     // remedy it belongs to and which labelled group of that remedy it sits in
     (data.remedies || []).forEach((rem, ri) => {
-      for (const s of rem.symptoms || [])
-        out.push({
-          t: s.text || "", p: null, rems: [], rem: ri,
-          ch: s.chapter || "General", mods: s.modalities || []
-        });
+      const syms = rem.symptoms || [];
+      if (syms.length) {
+        for (const s of syms)
+          out.push({
+            t: s.text || "", p: null, rems: [], rem: ri,
+            ch: s.chapter || "General", mods: s.modalities || []
+          });
+        return;
+      }
+      // Some volumes were transcribed as prose and carry their text in
+      // sections.general rather than as numbered symptoms. An empty page is not
+      // the same as an empty book, so the prose is shown as one block.
+      const secs = rem.sections || {};
+      const text = secs.general || Object.values(secs).filter(Boolean).join("\n\n");
+      if (text) out.push({ t: text, p: null, rems: [], rem: ri, ch: "General", mods: [] });
     });
     return out;
   }
-  const sections = data.section ? [data.section] : (data.sections || []);
+  // a repertory's divisions arrive as `chapters`, `sections` or a single `section`,
+  // depending on which pipeline built it. All three are the same thing to a reader.
+  const sections = data.section ? [data.section] : (data.sections || data.chapters || []);
   sections.forEach((sec, si) => {
     for (const r of sec.rubrics || [])
       out.push({
@@ -1138,7 +1150,11 @@ async function openChapter(c, { push = false } = {}) {
     S.rubrics = rubrics;
     S.mm = data.type === "materia_medica" ? (data.remedies || []) : null;
     S.treatise = data.type === "treatise" ? (data.sections || []) : null;
-    const secs = data.section ? [data.section] : (data.sections || []);
+    // A treatise's `sections` are paragraphs and a materia medica's are remedy
+    // blocks: neither is a chapter, and counting x.rubrics on them gives zero,
+    // which is what made the Organon report "General · 0 rubrics".
+    const isProse = data.type === "treatise" || data.type === "materia_medica";
+    const secs = isProse ? [] : (data.section ? [data.section] : (data.sections || data.chapters || []));
     S.sectionsMeta = secs.map(x => ({ title: x.title || "General", count: (x.rubrics || []).length }));
     S.activeSection = secs.length > 1 ? 0 : null;
     if (S.mm) {
@@ -1152,7 +1168,7 @@ async function openChapter(c, { push = false } = {}) {
       if (oldest !== c.file) { S.loaded.delete(oldest); idxCache.delete(oldest); }
     }
     if (S.treatise) viewRows = rubrics;                  // every paragraph, in order
-    else if (!S.mm && secs.length <= 1) viewRows = rubrics;   // else it is set above
+    else if (!S.mm && (secs.length <= 1 || c.title === "Whole book")) viewRows = rubrics;
     renderRail("chapters");     // the payload's sections are known only now
     renderChapter();
     $("#crumb").textContent = S.book.title.length > 34 ? S.book.title.slice(0, 34) + "…" : S.book.title;
