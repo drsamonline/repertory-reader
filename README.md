@@ -1,12 +1,12 @@
 # The Repertory Desk
 
 [![0 dependencies](docs/assets/badge-tests.svg)](docs/play/index.html)
-[![23 volumes](docs/assets/badge-deps.svg)](docs/play/index.html)
+[![54 volumes](docs/assets/badge-deps.svg)](docs/play/index.html)
 [![offline yes](docs/assets/badge-offline.svg)](docs/play/index.html)
 [![CC0 1.0](docs/assets/badge-licence.svg)](LICENSE)
 
 **A quiet reading room for seventeen classical homoeopathic repertories and five
-public-domain treatises** — 271,421 rubrics, 744,394 graded remedy links and 703
+public-domain treatises** — 307,998 rubrics, 1,359,069 graded remedy links and 703
 sections of prose, read straight from the open JSON library on GitHub. No account,
 no server, no tracking, no build step.
 
