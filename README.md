@@ -1,12 +1,12 @@
 # The Repertory Desk
 
 [![0 dependencies](docs/assets/badge-tests.svg)](docs/play/index.html)
-[![55 volumes](docs/assets/badge-deps.svg)](docs/play/index.html)
+[![70 volumes](docs/assets/badge-deps.svg)](docs/play/index.html)
 [![offline yes](docs/assets/badge-offline.svg)](docs/play/index.html)
 [![CC0 1.0](docs/assets/badge-licence.svg)](LICENSE)
 
 **A quiet reading room for sixteen classical homoeopathic repertories, six materia
-medicas and thirty-three public-domain treatises** — 349,681 rubrics, 1,426,235 remedy
+medicas and forty public-domain treatises** — 352,063 rubrics, 1,429,263 remedy
 links (751,907 of them graded) and 5,392 sections of prose, read straight from the open
 JSON library on GitHub. No account,
 no server, no tracking, no build step.
@@ -23,8 +23,10 @@ The library also carries prose works as a **treatise**: no rubrics, no remedies.
 numbered treatise (the Organon) shows a § against each paragraph; a chaptered one shows
 its chapter title instead. Each is a separate volume and none is merged with another.
 
-Thirty-two treatises, from the two Organons to Clarke's *Dictionary* in three volumes:
+Forty treatises, from the two Organons to Clarke's *Dictionary* in three volumes:
 
+- **B. L. Hill**, *An Epitome of the Homeopathic Healing Art* (1861) — 50 sections
+- **C. H. Vilas**, *Therapeutics of the Eye and Ear: An Elementary Manual, with a Repertory of the Eye* (1883) — 17 sections
 - **Constantine Hering**, *The Guiding Symptoms of Our Materia Medica* (1879) — 49 sections
 - **E. H. Ruddock**, *The Lady's Manual of Homoeopathic Treatment* (1870) — 32 sections
 - **E. H. Ruddock**, *The Homoeopathic Vade Mecum of Modern Medicine and Surgery* (1874) — 52 sections
@@ -35,13 +37,15 @@ Thirty-two treatises, from the two Organons to Clarke's *Dictionary* in three vo
 - **G. H. G. Jahr**, *The Venereal Diseases, Their Pathological Nature, Diagnosis and Treatment* (1868) — 230 sections
 - **G. H. G. Jahr; A. Possart**, *Jahr's and Possart's New Manual of the Homoeopathic Materia Medica* (1853) — 409 sections
 - **H. C. Allen**, *Keynotes and Characteristics with Comparisons of Some of the Leading Remedies of the Materia Medica* (1916) — 183 sections
-- **B. L. Hill**, *An Epitome of the Homeopathic Healing Art* (1861) — 50 sections
 - **Henry Newell Guernsey**, *The Application of the Principles and Practice of Homoeopathy to Obstetrics* (1866) — 77 sections
 - **J. H. Pulte**, *The Homoeopathic Domestic Physician* (1855) — 223 sections
 - **J. Henry Allen**, *The Chronic Miasms — Sycosis* (1908) — 23 sections
 - **J. Henry Allen**, *The Chronic Miasms — Psora and Pseudo-Psora* (1908) — 25 sections
+- **James Compton Burnett**, *The Curability of Cataract with Medicines* (1889) — 5 sections
 - **James Tyler Kent**, *Lectures on Homoeopathic Philosophy* (1900) — 21 sections
 - **James Tyler Kent**, *Lectures on Homoeopathic Materia Medica* (1904) — 251 sections
+- **James Tyler Kent**, *Lesser Writings of James Tyler Kent* (1900) — 36 sections
+- **James Tyler Kent**, *Clinical Cases* (1900) — 105 sections
 - **John A. Tarbell**, *Homoeopathy Simplified, or Domestic Practice Made Easy* (1864) — 210 sections
 - **John Henry Clarke**, *A Dictionary of Domestic Medicine* (1890) — 22 sections
 - **John Henry Clarke**, *A Dictionary of Practical Materia Medica, Volume I (A–H)* (1900) — 435 sections
@@ -50,6 +54,8 @@ Thirty-two treatises, from the two Organons to Clarke's *Dictionary* in three vo
 - **John R. Kippax**, *A Hand-Book of Diseases of the Skin and Their Homoeopathic Treatment* (1890) — 138 sections
 - **Joseph Laurie**, *The Homeopathic Guide for Family Use* (1870) — 89 sections
 - **Joseph T. O'Connor (ed.)**, *The American Homoeopathic Pharmacopoeia* (1883) — 580 sections
+- **Margaret Lucy Tyler**, *Pointers to the Common Remedies (remedies by disease)* (1936) — 60 sections
+- **Samuel Hahnemann**, *The Chronic Diseases: Their Specific Nature and Homoeopathic Treatment — the theoretical part* (1896) — 6 sections
 - **Samuel Hahnemann R. E. Dudgeon**, *Organon of Medicine, fifth edition* (1849) — 294 sections
 - **Samuel Hahnemann William Boericke**, *Organon of Medicine, sixth edition* (1922) — 291 sections
 - **Samuel Hahnemann; translated from the latest German editions**, *Materia Medica Pura (A–I)* (1880) — 36 sections
@@ -58,6 +64,7 @@ Thirty-two treatises, from the two Organons to Clarke's *Dictionary* in three vo
 - **T. C. Duncan**, *Hand Book on the Diseases of the Heart and Their Homoeopathic Treatment* (1898) — 68 sections
 - **Thomas Lindsley Bradford**, *The Life and Letters of Dr. Samuel Hahnemann* (1894) — 70 sections
 - **Willis Alonzo Dewey**, *Essentials of Homoeopathic Materia Medica* (1894) — 6 sections
+- **Willis Alonzo Dewey**, *Practical Homeopathic Therapeutics* (1900) — 102 sections
 
 The two Organons are genuinely different books: 74 paragraphs are worded differently and
 §292–§294 exist only in the fifth. Each paragraph carries the source it was read from and
