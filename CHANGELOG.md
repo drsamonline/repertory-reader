@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.1.0 — 2026-11-04
+
+- **The shelf grew to 54 volumes.** Thirty-two treatises now, sixteen repertories and six
+  materia medicas, spanning 1847–1922: Clarke's *Dictionary* complete in three volumes,
+  Hering's *Guiding Symptoms*, Allen's *Keynotes*, Dewey, Lilienthal, Jahr, Guernsey,
+  Duncan, Kippax, Pulte, Tarbell, Ruddock, Laurie, Humphreys and the rest.
+- **The figures were recounted, not incremented.** Every split volume had been missing
+  from the library's own totals, so remedy links were 613,588 short. The honest numbers
+  are 307,998 rubrics and 1,359,069 remedy links — of which **751,907 carry a printed
+  grade** and the remainder do not. The badge, landing page, README and app meta now say
+  exactly that, rather than calling all 1.36 million links "graded".
+- **The treatise list in the README is generated from the catalogue**, not hand-kept at
+  five entries while thirty-two sat on the shelf.
+
 ## 2.0.0 — 2026-11-03
 
 - **Chaptered treatises.** A treatise section may now carry a `title` instead of a
