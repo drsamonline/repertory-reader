@@ -472,7 +472,10 @@ const debounce = (f, ms) => { let t; return (...a) => { clearTimeout(t); t = set
 /* Remedies are printed with whatever spacing and punctuation the compositor had:
    'Nux-v.', 'Nux v.', 'NuxVom', '(Calc-c)', 'ph-ac,' are one remedy each. The key
    is the letters alone, so variants collapse to a single remedy. */
-const rkey = s => String(s || "").toLowerCase().replace(/[^a-z]/g, "");
+/* Fold first, then strip: "Ménière" used to become "mnire", so a reader typing
+   "meniere" could never match the remedy, and "Café"/"Cfe" collided. */
+const fold = s => String(s == null ? "" : s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const rkey = s => fold(s).replace(/[^a-z]/g, "");
 const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const fmt = n => n >= 1000 ? n.toLocaleString("en-US") : String(n);
 
@@ -529,7 +532,9 @@ const mem = new Map();
 const idxCache = new Map();
 function buildIndex(path, rubrics) {
   if (idxCache.has(path)) return idxCache.get(path);
-  const lower = rubrics.map(r => (r.t || "").toLowerCase());
+  // fold() keeps one code unit per precomposed letter, so the index it returns
+  // still points at the right character in the original rubric for highlighting.
+  const lower = rubrics.map(r => fold(r.t));
   const byRemedy = new Map();
   rubrics.forEach((r, i) => {
     for (const x of r.rems) {

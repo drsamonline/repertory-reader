@@ -1,0 +1,24 @@
+name: Test
+
+# The page has no build step, so there is nothing to compile — but the functions
+# it defines for search are worth a check, and a test nobody runs is a file.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fold:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Accent folding, read out of the page that ships
+        run: node tests/fold.test.js
