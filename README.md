@@ -147,6 +147,7 @@ is not.
 | | |
 |---|---|
 | UPI (India) | `drsohilboi@ybl` — [open in a UPI app](upi://pay?pa=drsohilboi%40ybl&pn=Dr.%20Sohil%20Momin&cu=INR) |
+| GitHub Sponsors | [github.com/sponsors/drsamonline](https://github.com/sponsors/drsamonline) |
 | Ko-fi | <https://ko-fi.com/matneo> |
 | PayPal | <https://paypal.me/drsohilmomin?locale.x=en_GB&country.x=IN> |
 | Books | <https://www.amazon.com/stores/author/B08ZT331LY/allbooks?ccs_id=aed72b9f-71d9-41dc-adee-e9368a317acc> |
